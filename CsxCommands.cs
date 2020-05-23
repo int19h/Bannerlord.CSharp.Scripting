@@ -95,7 +95,7 @@ namespace Int19h.Csx {
                 "TaleWorlds.ObjectSystem"
             );
 
-            var code = string.Join(" ", args);
+            var code = string.Join(" ", args).Replace('\'', '"');
             var result = CSharpScript.EvaluateAsync(code, options).GetAwaiter().GetResult();
             return $"{result}";
         });
