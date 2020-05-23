@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30014.187
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csx", "csx.csproj", "{1DF4451B-D94C-4AAF-9CD1-B7BF464AF8C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DF4451B-D94C-4AAF-9CD1-B7BF464AF8C5}.Debug|x64.ActiveCfg = Debug|x64
+		{1DF4451B-D94C-4AAF-9CD1-B7BF464AF8C5}.Debug|x64.Build.0 = Debug|x64
+		{1DF4451B-D94C-4AAF-9CD1-B7BF464AF8C5}.Release|x64.ActiveCfg = Release|x64
+		{1DF4451B-D94C-4AAF-9CD1-B7BF464AF8C5}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD1224F2-D7A0-4063-BF4C-2CAAF1E911FC}
+	EndGlobalSection
+EndGlobal
