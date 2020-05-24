@@ -5,10 +5,6 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 
-//MBObjectManager.Instance.GetObject<ItemObject>("grain");
-//PartyBase.MainParty.ItemRoster.AddToCounts(@object, result);
-//Settlement.ItemRoster;
-
 const int ExtraFood = 1000000;
 
 var towns = Town.AllTowns.Union(Town.AllCastles).ToArray();

@@ -10,7 +10,7 @@ var banditParties = (
     where clan != Clan.PlayerClan && clan.IsBanditFaction
     from party in clan.Parties
     select party
-).ToArray(); // snapshot, since the list will change as we iterate and destroy them
+).ToArray(); // snapshot
 
 foreach (var party in banditParties) {
     Log.WriteLine($"Destroying {party}");
