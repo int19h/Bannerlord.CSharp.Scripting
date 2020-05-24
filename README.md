@@ -4,7 +4,7 @@ This mod for [M&B2: Bannerlord](https://www.taleworlds.com/en/Games/Bannerlord) 
 
 ## Installation
 
-Download the most recent version from [Releases](/releases), and unpack it to the Modules folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
+Download the most recent version from [Releases](https://github.com/int19h/csx/releases), and unpack it to the Modules folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
 
 If the mod has been loaded correctly, you should see "C# Scripting" when you click Mods in the launcher.
 
