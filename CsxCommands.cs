@@ -40,7 +40,7 @@ namespace Int19h.Csx {
             }
 
             var fileNames = Directory.GetFiles(ScriptsPath, "*.csx");
-            var scriptNames = fileNames.Select(s => Path.GetFileNameWithoutExtension(s));
+            var scriptNames = fileNames.Select(s => Path.GetFileNameWithoutExtension(s)).Where(s => !s.StartsWith("_"));
             return string.Join("\n", scriptNames);
         });
 
