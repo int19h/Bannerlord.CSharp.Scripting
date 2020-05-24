@@ -92,6 +92,7 @@
     <Compile Include="ScriptGlobals.cs" />
     <Compile Include="SubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="LICENSE">
