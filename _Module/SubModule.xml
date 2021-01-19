@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<Name value="C# Scripting" />
+	<Id value="$modulename$" />
+	<Version value="v$version$" />
+	<Official value="false" />
+	<DefaultModule value="false" />
+	<SingleplayerModule value="true" />
+	<MultiplayerModule value="false" />
+	<DependedModules />
+	<SubModules>
+		<SubModule>
+			<Name value="$modulename$" />
+			<DLLName value="$modulename$.dll" />
+			<SubModuleClassType value="Int19h.Bannerlord.CSharp.Scripting.SubModule"/>
+			<Tags>
+				<Tag key="DedicatedServerType" value="none" />
+				<Tag key="IsNoRenderModeElement" value="false" />
+			</Tags>
+			<Tags />
+		</SubModule>
+	</SubModules>
+</Module>

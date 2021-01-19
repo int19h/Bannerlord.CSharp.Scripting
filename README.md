@@ -10,7 +10,7 @@ If the mod has been loaded correctly, you should see "C# Scripting" when you cli
 
 ## Usage
 
-You will need the [Developer Console](https://www.nexusmods.com/mountandblade2bannerlord/mods/4) mod to access the console. This mod adds three new console commands, all under `csx` namespace.
+This mod adds several new console commands, all under `csx` namespace. In the game, press `Alt`+`~` to activate the console.
 
 ### `csx.eval`
 
@@ -24,7 +24,7 @@ Evaluates its arguments as C# code. For example:
 1000000000
 ```
 
-Developer console does its own argument parsing, so `csx.eval` has to do some guesswork to reconstitute the original expression. The console replaces any sequence of spaces with a single space, and strips out double quotes (`"`) entirely.
+Developer console does its own argument parsing, so `csx.eval` has to do some guesswork to reconstitute the original expression. The console replaces any sequence of spaces with a single space, strips out double quotes (`"`) entirely, and treats semicolons (`;`) as console command separators.
 
 To allow for string literals, `csx.eval` substitutes all single quotes with double quotes. Thus, you can write things like:
 ```
@@ -32,9 +32,16 @@ To allow for string literals, `csx.eval` substitutes all single quotes with doub
 ```
 On the other hand, this means that character literals are unavailable. These should rarely be needed when using Bannerlord APIs, but if necessary, the workarounds include indexing a string literal: `'A'[0]`; or casting an integer literal: `(char)65`.
 
-Note that this substitution *only* applies to the arguments of `csx.eval`. In particular, it does *not* apply to `csx.run`, which uses regular C# syntax with no changes.
+To allow for statements, `csx.eval` substitutes every period that are immediately followed by a comma (`.,`) with a semicolon:
+```
+# csx.eval var x = 42.,
+```
 
-To facilitate one-liners, the expression is evaluated in an environment in which every assembly that is loaded into the game process is automatically referenced, and the following namespaces are imported as if with a `using` declaration:
+If the sequence must appear as is, e.g. in a string literal, split it into two literals and concatenate them: `'.' + ','`.
+
+(Note that these substitutions *only* apply to the arguments of `csx.eval`. In particular, it does *not* apply to `csx.run`, which uses regular C# syntax with no changes.)
+
+To facilitate one-liners, the expression is evaluated in an environment in which every assembly that is loaded into the game process is automatically referenced. Furthermore, several namespaces are implicitly imported, as if with a `using` declaration:
 
 - `System`
 - `System.Collections.Generic`
@@ -49,19 +56,31 @@ To facilitate one-liners, the expression is evaluated in an environment in which
 - `TaleWorlds.MountAndBlade`
 - `TaleWorlds.ObjectSystem`
 
-The value produced by the expression, if any, is stringified and printed to the console.
+This list is configurable via `csx.xml`, located under `...\Documents\Mount and Blade II Bannerlord\Configs` - if it's not present, it will be created the first time the mod is loaded.
+
+The value produced by the evaluated expression, if any, is stringified and printed to the console.
+
+Script state, including any declared variables and functions, is preserved between evaluations. Thus, it's possible to reference some object repeatedly without having to look it up every time:
+```
+# csx.eval var npc = Hero.All.Single(hero => hero.Name.ToString() == 'Liena').,
+# csx.eval npc
+Liena
+```
+
+### `csx.reset`
+Resets the script state. This effectively deletes all variables and functions previously declared using `csx.eval`.
 
 ### `csx.run`
 
 Runs a C# script file with the specified name and arguments. The first argument is the name of the script to run, without the `.csx` extension. The remaining arguments are passed as is to the script.
 
-To determine the name of the script file, `.csx` extension is appended to the supplied script name, and the file is looked up in the `scripts` folder of the mod. For example, given:
+To determine the name of the script file, `.csx` extension is appended to the supplied script name, and the file is looked up in the `...\Documents\Mount and Blade II Bannerlord\Scripts` folder. For example, given:
 ```
 # csx.run test
 ```
-the script that is executed is `...\Mount & Blade II Bannerlord\Modules\csx\scripts\test.csx`. This sample script is provided with the mod.
+the script that is executed is `...\Documents\Mount and Blade II Bannerlord\Scripts\test.csx`. This sample script is provided with the mod.
 
-The .csx file extension reflects the fact that it's a C# *script*, not a regular application. The language is the same, but the [scripting dialect](https://docs.microsoft.com/en-us/archive/msdn-magazine/2016/january/essential-net-csharp-scripting) is more relaxed - for example, top-level variable and function declarations are allowed. The dialect is the same as used by the C# REPL in Visual Studio, and by csi.exe.
+The `.csx` file extension reflects the fact that it's a C# *script*, not a regular application. The language is the same, but the [scripting dialect](https://docs.microsoft.com/en-us/archive/msdn-magazine/2016/january/essential-net-csharp-scripting) is more relaxed - for example, top-level variable and function declarations are allowed. The dialect is the same as used by the C# REPL in Visual Studio, and by csi.exe.
 
 Like `csx.run`, the script automatically references all assemblies that are already loaded in the game process. However, there are no implicit `using` declarations for namespaces.
 
@@ -73,17 +92,22 @@ using TaleWorlds.CampaignSystem;
 Hero.MainHero.Gold = 1000000000;
 return "I'm rich!"; // printed to console
 ```
-Unfortunately, console in Bannerlord does not provide facilities to generate output while the script is running - only after it completed. Thus, if the script fails for any reason before `return`, you won't see the output at all. Furthermore, there is a fairly small length limit imposed on output.
+Unfortunately, console in Bannerlord does not provide facilities to generate output while the script is running - only after it completed. Thus, if the script fails for any reason before `return`, you won't see the output at all. 
 
-Sometimes, however, you do want to log some information as the script is running - e.g. to determine where exactly it fails. Or you want to produce a very long listing that will be trimmed by the console. To make this easier, the script can use the global variable named `Log`. It's a custom implementation of `TextWriter` that writes output into a file with the same name as the script, but extension replaced with `.log`. However, the file is created on first use - if you never write anything to `Log`, the file won't be there. If the file was created, then `return`ed value is also written into it.
+Sometimes, however, you do want to log some information as the script is running - e.g. to determine where exactly it fails. To make this easier, the script can use the global variable named `Log`. It's a custom implementation of `TextWriter` that remembers everything that's written into it, and prints it to the console once the script completes - even if it fails with an exception. If the script successfully returns some value, it's printed after everything that was in `Log`.
+
+Some scripts produce so much output that reading it in the console is inconvenient. For such cases, `Log` also provides a way to write output to file - just call `Log.ToFile()`, and optionally provide the filename to write to. If filename is not specified, the output is written to file with the same name as the script, but extension replaced with `.log`:
 ```cs
-Log.WriteLine("Hello, world!"); // automatically creates the log file
-return "All done"; // also written to log, since it's already created
+// test.csx
+Log.WriteLine("foo");  // This is only written to game console.
+Log.ToFile();          // ... now also writing to test.log ...
+Log.WriteLine("bar");  // This is written to console and to test.log,
+return "baz";          // and so is this
 ```
 
 ### `csx.list`
 
-Lists the scripts available to `csx.run`. This is simply the directory listing of `...\Mount & Blade II Bannerlord\Modules\csx\scripts\*.csx`, with `.csx` file extensions removed. It also hides any filename that starts with an underscore - by convention, leading underscore is for reusable scripts that are referenced via `#load` from other scripts.
+Lists the scripts available to `csx.run`. This is simply the directory listing of `...\Documents\Mount and Blade II Bannerlord\Scripts\*.csx`, with file extensions removed. It also hides any filename that starts with an underscore - by convention, leading underscore is for reusable scripts that are referenced via `#load` from other scripts.
 
 ## Savegame compatibility
 
