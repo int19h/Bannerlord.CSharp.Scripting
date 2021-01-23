@@ -2,15 +2,49 @@
 
 This mod for [M&B2: Bannerlord](https://www.taleworlds.com/en/Games/Bannerlord) utilizes the .NET Compiler Platform SDK (Roslyn) to allow you to compile and execute C# code snippets and scripts at runtime, with full access to the Bannerlord mod API.
 
+## Prerequisites
+
+The mod is tested with Bannerlord e1.5.6 and e1.5.7 beta. Older versions of the game *may* work, but are considered unsupported.
+
+There are no known compatibility issues with other Bannerlord mods. 
+
 ## Installation
 
 Download the most recent version from [Releases](https://github.com/int19h/csx/releases), and unpack it to the Modules folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
 
 If the mod has been loaded correctly, you should see "C# Scripting" when you click Mods in the launcher.
 
-## Usage
+## Quick start
 
-This mod adds several new console commands, all under `csx` namespace. In the game, press `Alt`+`~` to activate the console.
+This mod adds several new console commands, all under `csx` namespace. In the game, press `Alt`+`~` to activate the console. To try out the mod, first do:
+```
+# csx.list
+```
+If the mod is installed correctly, you should see output that looks something like this:
+```
+@ C:\Users\...\Documents\Mount and Blade II Bannerlord\Scripts:
+
+always_pregnant
+feed_all_settlements
+kill_all_bandits
+kill_all_nobles
+test
+world_revolution
+```
+Now try running the test script:
+```
+# csx.run test 1 2 3
+```
+You should see:
+```
+Arguments passed to this script:
+    1
+    2
+    3
+C# scripting test completed successfully.
+```
+
+## Console commands
 
 ### `csx.eval`
 
