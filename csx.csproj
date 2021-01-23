@@ -17,16 +17,22 @@
 
   <ItemGroup>
     <None Remove="Config.Default.xml" />
+    <None Remove="Samples\always_pregnant.csx" />
     <None Remove="Samples\feed_all_settlements.csx" />
     <None Remove="Samples\kill_all_bandits.csx" />
+    <None Remove="Samples\kill_all_nobles.csx" />
     <None Remove="Samples\test.csx" />
+    <None Remove="Samples\world_revolution.csx" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Config.Default.xml" />
+    <EmbeddedResource Include="Samples\always_pregnant.csx" />
     <EmbeddedResource Include="Samples\feed_all_settlements.csx" />
     <EmbeddedResource Include="Samples\kill_all_bandits.csx" />
+    <EmbeddedResource Include="Samples\kill_all_nobles.csx" />
     <EmbeddedResource Include="Samples\test.csx" />
+    <EmbeddedResource Include="Samples\world_revolution.csx" />
   </ItemGroup>
 
   <ItemGroup>

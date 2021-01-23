@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// Fills the granaries of all towns and castles, and for towns, also adds
+// food to their respective marketplaces.
+
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;

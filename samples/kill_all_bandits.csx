@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿// Destroys all bandit parties.
+
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
