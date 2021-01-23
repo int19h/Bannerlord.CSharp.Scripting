@@ -13,6 +13,11 @@
 
   <PropertyGroup>
     <GameFolder Condition="'$(GameFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
+    <Product>C# Scripting for Mount &amp; Blade II: Bannerlord</Product>
+    <Copyright>Copyright © 2020-2021 Pavel "int19h" Minaev</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/int19h/csx/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/int19h/csx/</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +28,10 @@
     <None Remove="Samples\kill_all_nobles.csx" />
     <None Remove="Samples\test.csx" />
     <None Remove="Samples\world_revolution.csx" />
+    <None Include="LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
