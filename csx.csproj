@@ -26,6 +26,7 @@
     <None Remove="Samples\feed_all_settlements.csx" />
     <None Remove="Samples\kill_all_bandits.csx" />
     <None Remove="Samples\kill_all_nobles.csx" />
+    <None Remove="Samples\settlement_values.csx" />
     <None Remove="Samples\test.csx" />
     <None Remove="Samples\world_revolution.csx" />
     <None Include="LICENSE.md">
@@ -40,6 +41,7 @@
     <EmbeddedResource Include="Samples\feed_all_settlements.csx" />
     <EmbeddedResource Include="Samples\kill_all_bandits.csx" />
     <EmbeddedResource Include="Samples\kill_all_nobles.csx" />
+    <EmbeddedResource Include="Samples\settlement_values.csx" />
     <EmbeddedResource Include="Samples\test.csx" />
     <EmbeddedResource Include="Samples\world_revolution.csx" />
   </ItemGroup>
