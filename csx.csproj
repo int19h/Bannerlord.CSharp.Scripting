@@ -18,6 +18,8 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/int19h/csx/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/int19h/csx/</RepositoryUrl>
+    <Authors>Pavel Minaev</Authors>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup>
