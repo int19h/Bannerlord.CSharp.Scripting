@@ -1,6 +1,4 @@
-﻿// Destroys all bandit parties.
-
-using System.Linq;
+﻿using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -8,9 +6,9 @@ using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 
 var banditParties = (
-    from clan in Campaign.Current.Clans
-    where clan != Clan.PlayerClan && clan.IsBanditFaction
-    from party in clan.Parties
+    from party in MobileParty.All
+    let clan = party.ActualClan
+    where clan != null && clan != Clan.PlayerClan && clan.IsBanditFaction
     select party
 ).ToArray(); // snapshot
 
