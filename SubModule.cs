@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using TaleWorlds.MountAndBlade;
+﻿using TaleWorlds.MountAndBlade;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public class SubModule : MBSubModuleBase {
