@@ -35,7 +35,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         private static ScriptOptions GetScriptOptions() => ScriptOptions.Default
             .WithEmitDebugInformation(true)
-            .WithReferences(GetLoadedAssemblies());
+            .WithReferences(GetLoadedAssemblies().Concat(new[] {
+                typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).Assembly,
+            }));
+        
         private static ScriptOptions GetEvalScriptOptions() => GetScriptOptions()
             .WithImports(Config.Load().EvalImports);
 

@@ -65,6 +65,7 @@
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup>
