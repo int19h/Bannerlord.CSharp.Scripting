@@ -5,7 +5,7 @@ using System.Linq;
 using TaleWorlds.Library;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-    public static class Scripts {
+    public static class ScriptFiles {
         public static readonly string Location = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.Personal),
             "Mount and Blade II Bannerlord",
@@ -24,10 +24,6 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             Enumerate().Contains(scriptName) ? Path.Combine(Location, scriptName + ".log") : null;
 
         public static void Initialize() {
-            if (Directory.Exists(Location)) {
-                return;
-            }
-
             try {
                 Directory.CreateDirectory(Location);
             } catch (Exception ex) {
@@ -35,14 +31,14 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 return;
             }
 
-            var prefix = typeof(Scripts).Namespace + ".Samples.";
-            foreach (var resourceName in typeof(Scripts).Assembly.GetManifestResourceNames()) {
+            var prefix = typeof(ScriptFiles).Namespace + ".Samples.";
+            foreach (var resourceName in typeof(ScriptFiles).Assembly.GetManifestResourceNames()) {
                 if (!resourceName.StartsWith(prefix)) {
                     continue;
                 }
 
                 var fileName = Path.Combine(Location, resourceName.Remove(0, prefix.Length));
-                using (var source = typeof(Scripts).Assembly.GetManifestResourceStream(resourceName)) {
+                using (var source = typeof(ScriptFiles).Assembly.GetManifestResourceStream(resourceName)) {
                     try {
                         using (var target = File.Open(fileName, FileMode.CreateNew)) {
                             source.CopyTo(target);

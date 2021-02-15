@@ -84,9 +84,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.list");
             }
 
-            output.WriteLine($"@ {Scripts.Location}:");
+            output.WriteLine($"@ {ScriptFiles.Location}:");
             output.WriteLine();
-            foreach (var line in Scripts.Enumerate()) {
+            foreach (var line in ScriptFiles.Enumerate()) {
                 output.WriteLine(line);
             }
         });
@@ -98,7 +98,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
 
             var scriptName = args[0];
-            var fileName = Scripts.GetFileName(scriptName);
+            var fileName = ScriptFiles.GetFileName(scriptName);
             if (fileName == null) {
                 throw new CommandException($"Script not found: {scriptName}");
             }

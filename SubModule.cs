@@ -6,7 +6,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             /// Enable binding redirects from our app.config - needed for System.Span in Roslyn 3.x.
             //ConfigurationManager.OpenExeConfiguration(GetType().Assembly.Location);
 
-            Scripts.Initialize();
+            ScriptFiles.Initialize();
         }
     }
 }
