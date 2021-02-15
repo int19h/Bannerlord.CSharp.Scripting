@@ -6,8 +6,10 @@ using System.Threading;
 using System.Windows.Forms;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-    public sealed partial class ScriptGlobals {
-        public string Dump(object o) {
+    partial class ScriptGlobals {
+        private static Func<string> _defaultToString = new object().ToString;
+
+        public static string Dump(object o) {
             if (o == null) {
                 return "null";
             }
@@ -150,7 +152,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             return output.ToString();
         }
 
-        public void Edit(params object[] objects) {
+        public static void Edit(params object[] objects) {
             var uiThread = new Thread(() => {
                 var grid = new PropertyGrid {
                     Dock = DockStyle.Fill,

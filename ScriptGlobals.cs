@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-    public sealed partial class ScriptGlobals : IDisposable {
-        private static Func<string> _defaultToString = new object().ToString;
-        private readonly LogWriter? _log;
+    public static partial class ScriptGlobals {
+        private static LogWriter? _log;
 
-        public IReadOnlyList<string> Arguments { get; }
+        public static IReadOnlyList<string> Arguments { get; private set; } = new string[0];
 
-        public LogWriter Log => _log ?? throw new InvalidOperationException("Logging not available");
-
-        public ScriptGlobals() {
-            Arguments = new string[0];
+        public static LogWriter Log {
+            get => _log ?? throw new InvalidOperationException("Logging not available");
         }
 
-        public ScriptGlobals(string scriptPath, TextWriter consoleWriter, IReadOnlyList<string> arguments) {
+        internal static void PrepareForEval() {
+            Arguments = new string[0];
+            _log = null;
+        }
+
+        internal static void PrepareForRun(string scriptPath, TextWriter consoleWriter, IReadOnlyList<string> arguments) {
             Arguments = arguments;
             _log = new LogWriter(Path.ChangeExtension(scriptPath, ".log"), consoleWriter);
         }
 
-        public void Dispose() {
+        internal static void Cleanup() {
             _log?.Dispose();
         }
     }
