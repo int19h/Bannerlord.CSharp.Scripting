@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public sealed class ScriptGlobals : IDisposable {
@@ -84,6 +86,23 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
 
             return output.ToString();
+        }
+
+        public void Edit(params object[] objects) {
+            var uiThread = new Thread(() => {
+                var grid = new PropertyGrid {
+                    Dock = DockStyle.Fill,
+                    SelectedObjects = objects,
+                };
+                var form = new Form {
+                    Controls = { grid },
+                    Text = objects.Length == 1 ? $"{objects[0]}" : $"{objects.Length} objects",
+                };
+                Application.Run(form);
+            });
+            uiThread.SetApartmentState(ApartmentState.STA);
+            uiThread.Start();
+            uiThread.Join();
         }
     }
 }
