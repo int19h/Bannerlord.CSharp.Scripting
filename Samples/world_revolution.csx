@@ -1,18 +1,25 @@
-﻿// Makes all towns owned by kingdoms, except those that belong to the player clan,
-// revolt against their owners.
+﻿// Makes all towns owned by kingdoms revolt against their owners.
 
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.ObjectSystem;
-
-foreach (var town in Town.AllTowns.ToArray()) {
-    if (town.OwnerClan == Clan.PlayerClan || town.OwnerClan.Kingdom == null) {
+foreach (var town in Town.AllFiefs) {
+    Log.Write(town);
+    if (town.OwnerClan.Kingdom == null) {
+        Log.WriteLine(" - not in a kingdom");
+        continue;
+    } else if (Arguments.Any(x => x.ToLower() == $"{town}".ToLower())) {
+        Log.WriteLine(" - excluded");
         continue;
     }
-    town.Settlement.Militia = 100000;
-    town.Loyalty = -100;
-    town.Security = -100;
+    Log.WriteLine(" - REVOLTING!");
+
+    var rcb = Campaign.Current.CampaignBehaviorManager.GetBehavior<RebellionsCampaignBehavior>();
+    rcb.GetType().InvokeMember(
+        "StartRebellionEvent",
+        BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic,
+        null,
+        rcb,
+        new object[] { town.Settlement },
+        new ParameterModifier[0],
+        null,
+        null
+    );
 }

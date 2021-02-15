@@ -1,25 +1,19 @@
-﻿// Fills the granaries of all towns and castles, and for towns, also adds
-// food to their respective marketplaces.
-
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.ObjectSystem;
+﻿// Maxes out food stocks of all settlements. For towns and villages, also adds food to their markets.
 
 const int ExtraFood = 1000000;
 
-var towns = Town.AllTowns.Union(Town.AllCastles).ToArray();
-foreach (var town in towns) {
+foreach (var town in Town.AllFiefs) {
     Log.Write($"{town} food stocks: {town.FoodStocks}");
     town.FoodStocks = town.FoodStocksUpperLimit();
     Log.WriteLine($" -> {town.FoodStocks}");
 }
 
 var foods = ItemObject.All.Where(item => item.IsFood).ToArray();
-var settlements = Settlement.All.Where(setl => setl.IsTown || setl.IsVillage).ToArray();
-foreach (var settlement in settlements) {
+foreach (var settlement in Settlement.All) {
+    if (!settlement.IsTown && !settlement.IsVillage) {
+        continue;
+    }
+
     Log.WriteLine($"{settlement} item roster:");
     var roster = settlement.ItemRoster;
 
@@ -35,7 +29,3 @@ foreach (var settlement in settlements) {
         Log.WriteLine($" -> {count}");
     }
 }
-
-return
-    $"Maxed out food stocks for {towns.Length} towns and castles.\n" +
-    $"Added food to item rosters of {settlements.Length} towns and villages.\n";

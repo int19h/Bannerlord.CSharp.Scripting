@@ -1,9 +1,4 @@
-﻿using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.ObjectSystem;
+﻿// Destroys all bandit parties.
 
 var banditParties = (
     from party in MobileParty.All

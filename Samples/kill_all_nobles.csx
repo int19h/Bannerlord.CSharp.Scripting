@@ -1,13 +1,6 @@
 ﻿// Kills all the nobles and mercenary leaders, except for those who belong
 // to the player clan.
 
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.ObjectSystem;
-
 var nobles = (
     from clan in Campaign.Current.Clans
     where clan != Clan.PlayerClan && (clan.Kingdom != null || clan.IsClanTypeMercenary)

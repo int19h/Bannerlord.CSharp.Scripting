@@ -1,20 +1,13 @@
-﻿// Makes the player or their spouse (depending on the gender) pregnant as soon
-// as they give birth. Doesn't persist across saved games - must be reapplied.
-// Note that, regardless of the gender, the mother has to be married - otherwise
-// the game will crash on birth!
-
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.ObjectSystem;
-
+﻿// Makes every married female noble in player's clan pregnant, whenever they're not.
+// Doesn't persist across saved games - must be reapplied on every load.
 
 void DailyTick() {
-    var target = Hero.MainHero.IsFemale ? Hero.MainHero : Hero.MainHero.Spouse;
-    if (target != null && target.Spouse != null && !target.IsPregnant) {
-        MakePregnantAction.Apply(target);
+    foreach (var noble in Hero.MainHero.Clan.Lords) {
+        if (noble.IsAlive && noble.IsFemale && !noble.IsPregnant &&
+            noble.Spouse != null && noble.Age >= 18 && noble.Age <= 45
+        ) {
+            MakePregnantAction.Apply(noble);
+        }
     }
 }
 
