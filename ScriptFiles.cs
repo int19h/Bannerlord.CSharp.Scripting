@@ -31,7 +31,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 return;
             }
 
-            var prefix = typeof(ScriptFiles).Namespace + ".Samples.";
+            var prefix = typeof(ScriptFiles).Namespace + ".Scripts.";
             foreach (var resourceName in typeof(ScriptFiles).Assembly.GetManifestResourceNames()) {
                 if (!resourceName.StartsWith(prefix)) {
                     continue;
