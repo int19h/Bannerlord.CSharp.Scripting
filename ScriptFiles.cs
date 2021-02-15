@@ -38,6 +38,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 }
 
                 var fileName = Path.Combine(Location, resourceName.Remove(0, prefix.Length));
+                if (File.Exists(fileName)) {
+                    continue;
+                }
+
                 using (var source = typeof(ScriptFiles).Assembly.GetManifestResourceStream(resourceName)) {
                     try {
                         using (var target = File.Open(fileName, FileMode.CreateNew)) {
