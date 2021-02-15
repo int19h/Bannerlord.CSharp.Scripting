@@ -38,14 +38,6 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 .AddImports(rsp.CompilationOptions.Usings);
         }
 
-        private static ScriptOptions GetEvalScriptOptions() {
-            var rsp = new RspFile("csx.eval.rsp").Parse();
-            var refs = rsp.ResolveMetadataReferences(ScriptMetadataResolver.Default);
-            return GetScriptOptions()
-                .AddReferences(refs)
-                .AddImports(rsp.CompilationOptions.Usings);
-        }
-
         [CommandLineFunctionality.CommandLineArgumentFunction("help", "csx")]
         public static string Help (List<string> args) => WithErrorHandling(output => {
             if (args.Count != 0) {
@@ -63,7 +55,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.reset");
             }
 
-            _evalState = CSharpScript.RunAsync("", GetEvalScriptOptions()).GetAwaiter().GetResult();
+            _evalState = CSharpScript.RunAsync("", GetScriptOptions()).GetAwaiter().GetResult();
             output.Write("Script state reset.");
         });
 
@@ -81,7 +73,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             var code = string.Join(" ", args).Replace('\'', '"').Replace(".,", ";");
             try {
                 ScriptGlobals.PrepareForEval();
-                _evalState = _evalState!.ContinueWithAsync(code, GetEvalScriptOptions()).GetAwaiter().GetResult();
+                _evalState = _evalState!.ContinueWithAsync(code, GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();
             }
