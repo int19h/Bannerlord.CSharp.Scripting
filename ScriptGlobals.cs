@@ -6,6 +6,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
     public static partial class ScriptGlobals {
         private static LogWriter? _log;
 
+        public static dynamic Scripts = new Scripts();
+
         public static IReadOnlyList<string> Arguments { get; private set; } = new string[0];
 
         public static LogWriter Log {

@@ -27,15 +27,6 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             return output.ToString();
         }
 
-        private static ScriptOptions GetScriptOptions() {
-            var rsp = RspFile.Generated.Parse();
-            var refs = rsp.ResolveMetadataReferences(ScriptMetadataResolver.Default);
-            return ScriptOptions.Default
-                .WithEmitDebugInformation(true)
-                .AddReferences(refs)
-                .AddImports(rsp.CompilationOptions.Usings);
-        }
-
         [CommandLineFunctionality.CommandLineArgumentFunction("help", "csx")]
         public static string Help (List<string> args) => WithErrorHandling(output => {
             if (args.Count != 0) {
@@ -53,7 +44,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.reset");
             }
 
-            _evalState = CSharpScript.RunAsync("", GetScriptOptions()).GetAwaiter().GetResult();
+            _evalState = CSharpScript.RunAsync("", Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             output.Write("Script state reset.");
         });
 
@@ -71,7 +62,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             var code = string.Join(" ", args).Replace('\'', '"').Replace(".,", ";");
             try {
                 ScriptGlobals.PrepareForEval();
-                _evalState = _evalState!.ContinueWithAsync(code, GetScriptOptions()).GetAwaiter().GetResult();
+                _evalState = _evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();
             }
@@ -107,7 +98,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             var code = $"#load \"{fileName}\"";
             try {
                 ScriptGlobals.PrepareForRun(fileName, output, args);
-                var result = CSharpScript.EvaluateAsync(code, GetScriptOptions()).GetAwaiter().GetResult();
+                var result = CSharpScript.EvaluateAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
                 if (result != null) {
                     ScriptGlobals.Log.Write(result);
                 }
