@@ -65,6 +65,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.CampaignSystem.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Core.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
@@ -78,6 +82,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.ObjectSystem.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>

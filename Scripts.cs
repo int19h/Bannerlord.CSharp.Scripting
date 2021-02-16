@@ -26,6 +26,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new FileNotFoundException($"Function script not found: {scriptName}");
             }
 
+            args = args.Select(arg => arg is string s ? new StringLookup(s) : arg).ToArray();
+
             var provider = new CSharpCodeProvider();
             var codegenOptions = new CodeGeneratorOptions();
             var code = new StringWriter();
@@ -42,7 +44,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 Name = "_Invoke",
                 ReturnType = new CodeTypeReference(typeof(object)),
                 Statements = {
-                    new CodeMethodReturnStatement(invokeExpr),
+                    new CodeMethodReturnStatement(invokeExpr) {
+                        LinePragma = new CodeLinePragma(fileName, 1),
+                    },
                 },
             };
             var returnInvokerStmt = new CodeMethodReturnStatement(
