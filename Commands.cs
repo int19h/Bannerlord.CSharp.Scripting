@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -77,9 +78,18 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             output.WriteLine($"@ {ScriptFiles.Location}:");
             output.WriteLine();
-            foreach (var line in ScriptFiles.Enumerate()) {
+
+            var funcScripts = ScriptFiles.Enumerate().Where(s => s.EndsWith("()"));
+            foreach (var line in funcScripts.OrderBy(s => s)) {
                 output.WriteLine(line);
             }
+            output.WriteLine();
+
+            var commandScripts = ScriptFiles.Enumerate().Except(funcScripts);
+            foreach (var line in commandScripts.OrderBy(s => s)) {
+                output.WriteLine(line);
+            }
+            output.WriteLine();
         });
 
         [CommandLineFunctionality.CommandLineArgumentFunction("run", "csx")]
