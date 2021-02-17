@@ -64,14 +64,11 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             var argNames = Enumerable.Repeat((string?)null, posCount).Concat(binder.CallInfo.ArgumentNames).ToArray();
 
             var invokeExpr = new CodeMethodInvokeExpression(null, binder.Name);
-            var invokerDelegate = new CodeTypeDelegate("_InvokeType") {
-                ReturnType = new CodeTypeReference(typeof(object))
-            };
+            var invokerDelegate = new CodeTypeDelegate("_InvokeType");
             var invokerMethod = new CodeMemberMethod {
                 Name = "_Invoke",
-                ReturnType = new CodeTypeReference(typeof(object)),
                 Statements = {
-                    new CodeMethodReturnStatement(invokeExpr) {
+                    new CodeExpressionStatement(invokeExpr) {
                         LinePragma = new CodeLinePragma(fileName, 1),
                     },
                 },
