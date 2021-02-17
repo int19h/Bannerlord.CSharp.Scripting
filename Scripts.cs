@@ -55,7 +55,11 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             for (int i = 0; i < args.Length; ++i) {
                 var argName = argNames[i];
+                
                 var argType = args[i]?.GetType() ?? typeof(object);
+                while (argType.IsNotPublic) {
+                    argType = argType.BaseType;
+                }
 
                 var param = new CodeParameterDeclarationExpression(argType, $"arg{i}");
                 invokerDelegate.Parameters.Add(param);
