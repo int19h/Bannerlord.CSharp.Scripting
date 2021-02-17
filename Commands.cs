@@ -74,6 +74,14 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             output.Write(evalState.ReturnValue);
         });
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("dump", "csx")]
+        public static string Dump(List<string> args) =>
+            Eval(args.Prepend("Dump(").Append(")").ToList());
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("edit", "csx")]
+        public static string Edit(List<string> args) =>
+            Eval(args.Prepend("Edit(").Append(")").ToList());
+
         [CommandLineFunctionality.CommandLineArgumentFunction("list", "csx")]
         public static string List(List<string> args) => WithErrorHandling(output => {
             if (args.Count != 0) {
