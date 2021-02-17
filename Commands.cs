@@ -11,7 +11,7 @@ using TaleWorlds.Library;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public static class Commands {
-        private static ScriptState? _evalState = null;
+        private static ScriptState? evalState = null;
 
         private static string WithErrorHandling(Action<TextWriter> body) {
             var output = new System.IO.StringWriter();
@@ -49,7 +49,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.reset");
             }
 
-            _evalState = CSharpScript.RunAsync("", Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+            evalState = CSharpScript.RunAsync("", Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             output.Write("Script state reset.");
         });
 
@@ -60,18 +60,18 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.eval <code>");
             }
 
-            if (_evalState == null) {
+            if (evalState == null) {
                 Reset(new());
             }
 
             var code = ToCode(args);
             try {
                 ScriptGlobals.Prepare(output, null, null);
-                _evalState = _evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+                evalState = evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();
             }
-            output.Write(_evalState.ReturnValue);
+            output.Write(evalState.ReturnValue);
         });
 
         [CommandLineFunctionality.CommandLineArgumentFunction("list", "csx")]

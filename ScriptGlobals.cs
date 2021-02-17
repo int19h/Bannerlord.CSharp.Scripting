@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public static partial class ScriptGlobals {
-        private static LogWriter? _log;
+        private static LogWriter? log;
 
         public static readonly dynamic Scripts = new Scripts();
 
@@ -13,18 +13,18 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         public static IReadOnlyList<string> Arguments { get; private set; } = new string[0];
 
         public static LogWriter Log {
-            get => _log ?? throw new InvalidOperationException("Logging not available");
+            get => log ?? throw new InvalidOperationException("Logging not available");
         }
 
         internal static void Prepare(TextWriter consoleWriter, string? scriptPath, IReadOnlyList<string>? arguments) {
             Arguments = arguments ?? new string[0];
             ScriptGlobals.ScriptPath = scriptPath;
-            _log = new LogWriter(consoleWriter);
+            log = new LogWriter(consoleWriter);
         }
 
         internal static void Cleanup() {
-            _log?.Dispose();
-            _log = null;
+            log?.Dispose();
+            log = null;
         }
     }
 }
