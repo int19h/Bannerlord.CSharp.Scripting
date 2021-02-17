@@ -36,6 +36,7 @@
     <None Remove="Scripts\kill_all_nobles.csx" />
     <None Remove="Scripts\omnisharp.json" />
     <None Remove="Scripts\settlement_values.csx" />
+    <None Remove="Scripts\ShowFiefValues%28%29.csx" />
     <None Remove="Scripts\superclan.csx" />
     <None Remove="Scripts\test.csx" />
     <None Remove="Scripts\world_revolution.csx" />
@@ -59,6 +60,7 @@
     <EmbeddedResource Include="Scripts\kill_all_nobles.csx" />
     <EmbeddedResource Include="Scripts\omnisharp.json" />
     <EmbeddedResource Include="Scripts\settlement_values.csx" />
+    <EmbeddedResource Include="Scripts\ShowFiefValues().csx" />
     <EmbeddedResource Include="Scripts\superclan.csx" />
     <EmbeddedResource Include="Scripts\test.csx" />
     <EmbeddedResource Include="Scripts\world_revolution.csx" />
