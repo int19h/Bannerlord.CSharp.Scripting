@@ -1,9 +1,13 @@
-﻿using System.CodeDom;
+﻿using System;
+using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -27,7 +31,29 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new FileNotFoundException($"Function script not found: {scriptName}");
             }
 
-            args = args.Select(arg => arg is string s ? new StringLookup(s) : arg).ToArray();
+            args = args.Select(arg => {
+                switch (arg) {
+                    case string s:
+                        return (StringLookup)s;
+                    case ITuple tuple:
+                        return new Lookups(tuple);
+                    case IEnumerable en: {
+                            foreach (var iface in en.GetType().GetInterfaces()) {
+                                if (
+                                    iface.IsConstructedGenericType &&
+                                    iface.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                                ) {
+                                    var t = iface.GetGenericArguments()[0];
+                                    var wrapperType = typeof(EnumerableWithLookup<>).MakeGenericType(t);
+                                    return Activator.CreateInstance(wrapperType, en);
+                                }
+                            }
+                            goto default;
+                        }
+                    default:
+                        return arg;
+                }
+            }).ToArray();
 
             var provider = new CSharpCodeProvider();
             var codegenOptions = new CodeGeneratorOptions();
@@ -56,7 +82,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             for (int i = 0; i < args.Length; ++i) {
                 var argName = argNames[i];
-                
+
                 var argType = args[i]?.GetType() ?? typeof(object);
                 while (argType.IsNotPublic) {
                     argType = argType.BaseType;
