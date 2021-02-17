@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp;
@@ -78,7 +79,12 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             var state = CSharpScript.RunAsync(code.ToString(), GetScriptOptions()).GetAwaiter().GetResult();
             var invoker = state.ReturnValue;
-            result = invoker.GetType().InvokeMember("Invoke", BindingFlags.InvokeMethod, null, invoker, args);
+            try {
+                result = invoker.GetType().InvokeMember("Invoke", BindingFlags.InvokeMethod, null, invoker, args);
+            } catch (TargetInvocationException ex) {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw;
+            }
             return true;
         }
     }
