@@ -15,7 +15,7 @@ void ShowFiefValues(Town[] fiefs)  {
     var maxLength = Town.AllFiefs.Max(fief => fief.Name.ToString().Length);
 
     foreach (var (fief, value) in values) {
-        var icon = fief.IsTown ? "*" : "+";
+        var icon = fief.IsTown ? "@" : "*";
         var name = $"{fief}".PadRight(maxLength);
         Log.WriteLine($"{icon} {name} {value,11:C0}");
     }
