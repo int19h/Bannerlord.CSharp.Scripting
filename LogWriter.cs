@@ -1,19 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public sealed class LogWriter : TextWriter {
-        private readonly string _defaultPath;
+        private readonly string? _defaultPath;
         private List<TextWriter> _writers = new();
 
-        public LogWriter(string defaultPath, TextWriter consoleWriter) {
+        public LogWriter(string? defaultPath, TextWriter consoleWriter) {
             _defaultPath = defaultPath;
             _writers.Add(consoleWriter);
         }
 
         public void ToFile() {
+            if (_defaultPath == null) {
+                throw new InvalidOperationException("No default log path specified");
+            }
             ToFile(_defaultPath);
         }
 

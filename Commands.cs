@@ -62,7 +62,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             var code = string.Join(" ", args).Replace('\'', '"').Replace(".,", ";");
             try {
-                ScriptGlobals.PrepareForEval();
+                ScriptGlobals.PrepareForEval(output);
                 _evalState = _evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();

@@ -14,9 +14,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             get => _log ?? throw new InvalidOperationException("Logging not available");
         }
 
-        internal static void PrepareForEval() {
+        internal static void PrepareForEval(TextWriter consoleWriter) {
             Arguments = new string[0];
-            _log = null;
+            _log = new LogWriter(null, consoleWriter);
         }
 
         internal static void PrepareForRun(string scriptPath, TextWriter consoleWriter, IReadOnlyList<string> arguments) {
