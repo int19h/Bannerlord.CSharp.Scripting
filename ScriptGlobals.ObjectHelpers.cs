@@ -142,7 +142,14 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                     AppendValue(() => item);
                     output.AppendLine(",");
                     if (++i >= 1000) {
-                        output.AppendLine("  ...");
+                        if (o is ICollection coll) {
+                            int remaining = coll.Count - i;
+                            if (remaining > 0) {
+                                output.AppendLine($"  ... ({remaining} more) ...");
+                            }
+                        } else {
+                            output.AppendLine("  ...");
+                        }
                         break;
                     }
                 }
