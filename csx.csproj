@@ -81,6 +81,10 @@
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Localization.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
