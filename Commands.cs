@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using TaleWorlds.Library;
@@ -27,6 +28,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
             return output.ToString();
         }
+
+        private static string ToCode(IEnumerable<string> args) =>
+            string.Join(" ", args).Replace('\'', '"').Replace(".,", ";");
 
         [CommandLineFunctionality.CommandLineArgumentFunction("help", "csx")]
         public static string Help (List<string> args) => WithErrorHandling(output => {
@@ -60,9 +64,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 Reset(new());
             }
 
-            var code = string.Join(" ", args).Replace('\'', '"').Replace(".,", ";");
+            var code = ToCode(args);
             try {
-                ScriptGlobals.PrepareForEval(output);
+                ScriptGlobals.Prepare(output, null, null);
                 _evalState = _evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();
@@ -99,15 +103,21 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
 
             var scriptName = args[0];
-            var fileName = ScriptFiles.GetFileName(scriptName);
-            if (fileName == null) {
-                throw new CommandException($"Script not found: {scriptName}");
+            string? fileName = null;
+            string code;
+            if (Regex.IsMatch(scriptName, @"^\w+\(")) {
+                code = ToCode(args.Prepend("Scripts."));
+            } else {
+                fileName = ScriptFiles.GetFileName(scriptName);
+                if (fileName == null) {
+                    throw new CommandException($"Script not found: {scriptName}");
+                }
+                args.RemoveAt(0);
+                code = $"#load \"{fileName}\"";
             }
-            args.RemoveAt(0);
 
-            var code = $"#load \"{fileName}\"";
             try {
-                ScriptGlobals.PrepareForRun(fileName, output, args);
+                ScriptGlobals.Prepare(output, fileName, args);
                 var result = CSharpScript.EvaluateAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
                 if (result != null) {
                     ScriptGlobals.Log.Write(result);

@@ -102,13 +102,18 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             var state = CSharpScript.RunAsync(code.ToString(), GetScriptOptions()).GetAwaiter().GetResult();
             var invoker = state.ReturnValue;
+
+            var oldScriptPath = ScriptGlobals.ScriptPath;
+            ScriptGlobals.ScriptPath = fileName;
             try {
                 result = invoker.GetType().InvokeMember("Invoke", BindingFlags.InvokeMethod, null, invoker, args);
+                return true;
             } catch (TargetInvocationException ex) {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
                 throw;
+            } finally {
+                ScriptGlobals.ScriptPath = oldScriptPath;
             }
-            return true;
         }
     }
 }

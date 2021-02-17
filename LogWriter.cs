@@ -6,30 +6,28 @@ using System.Text;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public sealed class LogWriter : TextWriter {
-        private readonly string? _defaultPath;
-        private List<TextWriter> _writers = new();
+        private List<TextWriter> writers = new();
 
-        public LogWriter(string? defaultPath, TextWriter consoleWriter) {
-            _defaultPath = defaultPath;
-            _writers.Add(consoleWriter);
+        public LogWriter(TextWriter consoleWriter) {
+            writers.Add(consoleWriter);
         }
 
         public void ToFile() {
-            if (_defaultPath == null) {
-                throw new InvalidOperationException("No default log path specified");
+            if (ScriptGlobals.ScriptPath == null) {
+                throw new InvalidOperationException($"{nameof(ScriptGlobals.ScriptPath)} not specified");
             }
-            ToFile(_defaultPath);
+            ToFile(Path.ChangeExtension(ScriptGlobals.ScriptPath, ".log"));
         }
 
         public void ToFile(string path) {
-            _writers.Add(File.CreateText(path));
+            writers.Add(File.CreateText(path));
         }
 
-        public override Encoding Encoding => _writers[0].Encoding;
+        public override Encoding Encoding => writers[0].Encoding;
 
         protected override void Dispose(bool disposing) {
-            if (disposing && _writers != null) {
-                foreach (var writer in _writers.Skip(1)) {
+            if (disposing && writers != null) {
+                foreach (var writer in writers.Skip(1)) {
                     writer.Dispose();
                 }
             }
@@ -38,13 +36,13 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         }
 
         public override void Write(char value) {
-            foreach (var writer in _writers) {
+            foreach (var writer in writers) {
                 writer.Write(value);
             }
         }
 
         public override void Write(char[] buffer, int index, int count) {
-            foreach (var writer in _writers) {
+            foreach (var writer in writers) {
                 writer.Write(buffer, index, count);
             }
         }
