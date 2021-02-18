@@ -9,27 +9,27 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static Kingdom? MyKingdom => Me.Clan.Kingdom;
 
-        public static LookupTable<Town> MyFiefs => new(Me.Clan.Fiefs);
+        public static ILookupTable<Town> MyFiefs => Me.Clan.Fiefs.ToLookupTable();
 
-        public static Town[] MyTowns => MyFiefs[fief => fief.IsTown];
+        public static ILookupTable<Town> MyTowns => MyFiefs[fief => fief.IsTown];
 
-        public static Town[] MyCastles => MyFiefs[fief => fief.IsCastle];
+        public static ILookupTable<Town> MyCastles => MyFiefs[fief => fief.IsCastle];
 
         public static Village[] MyVillages => Me.Clan.Villages.ToArray();
 
         public static Hero? MySpouse => Me.Spouse;
 
-        public static Hero[] MyCompanions => Me.Clan.Companions.ToArray();
+        public static ILookupTable<Hero> MyCompanions => Me.Clan.Companions.ToLookupTable();
 
-        public static Hero[] MyFamily => Me.Clan.Lords.ToArray();
+        public static ILookupTable<Hero> MyFamily => Me.Clan.Lords.ToLookupTable();
 
-        public static Hero[] MyChildren => Me.Children.ToArray();
+        public static ILookupTable<Hero> MyChildren => Me.Children.ToLookupTable();
 
-        public static Hero[] MyDescendants => Me.Descendants();
+        public static ILookupTable<Hero> MyDescendants => Me.Descendants();
 
-        public static Hero[] MyFriends => Me.Friends();
+        public static ILookupTable<Hero> MyFriends => Me.Friends();
 
-        public static Hero[] MyEnemies => Me.Enemies();
+        public static ILookupTable<Hero> MyEnemies => Me.Enemies();
 
         public static MobileParty MyParty => Me.PartyBelongedTo;
 

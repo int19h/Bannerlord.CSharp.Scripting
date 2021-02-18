@@ -5,33 +5,47 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-    public interface ILookupTable<out T> : IEnumerable<T> {
+    public interface ILookupTable<out T> : IReadOnlyCollection<T> {
+        T this[int index] { get; }
+
         T this[Lookup lookup] { get; }
 
-        T[] this[Predicate<T> predicate] { get; }
+        ILookupTable<T> this[Predicate<T> include] { get; }
     }
 
-    public struct LookupTable<T> : ILookupTable<T>
+    public static class LookupTable {
+        public static ILookupTable<T> ToLookupTable<T>(this IEnumerable<T> items)
+            where T : class
+            => new LookupTable<T>(items);
+    }
+
+    internal class LookupTable<T> : ILookupTable<T>
         where T : class {
 
-        private readonly IEnumerable<T> source;
+        private readonly T[] items;
 
-        public LookupTable(IEnumerable<T> source) {
-            this.source = source;
+        public LookupTable(IEnumerable<T> items) {
+            this.items = items.ToArray();
         }
 
-        public IEnumerator<T> GetEnumerator() => source.GetEnumerator();
+        public LookupTable(LookupTable<T> other) {
+            items = other.items;
+        }
+
+        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)items).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public static implicit operator T[](LookupTable<T> en) => en.ToArray();
+        public int Count => items.Length;
+
+        public T this[int index] => items[index];
 
         public T this[Lookup lookup] {
             get {
-                var items = this.Where(lookup.Matches).ToArray();
-                if (items.Length == 1) {
-                    return items[0];
-                } else if (items.Length == 0) {
+                var matching = this.Where(lookup.Matches).ToArray();
+                if (matching.Length == 1) {
+                    return matching[0];
+                } else if (matching.Length == 0) {
                     throw new KeyNotFoundException($"No {typeof(T).Name} with {lookup.What} == '{lookup}'");
                 } else {
                     throw new KeyNotFoundException($"More than one {typeof(T).Name} with {lookup.What} == '{lookup}'");
@@ -39,14 +53,15 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
         }
 
-        public T[] this[params Lookup[] lookups] {
+        public ILookupTable<T> this[params Lookup[] lookups] {
             get {
                 var self = this;
-                return lookups.Select(lookup => self[lookup]).ToArray();
+                return lookups.Select(lookup => self[lookup]).ToLookupTable();
             }
         }
 
-        public T[] this[Predicate<T> include] => this.Where(item => include(item)).ToArray();
+        public ILookupTable<T> this[Predicate<T> include] =>
+            this.Where(item => include(item)).ToLookupTable();
     }
 
     internal struct LookupTables {

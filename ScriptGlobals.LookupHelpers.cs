@@ -8,29 +8,29 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static IdLookup Id(string id) => new IdLookup(id);
 
-        public static LookupTable<Kingdom> Kingdoms => new(Kingdom.All);
+        public static ILookupTable<Kingdom> Kingdoms => Kingdom.All.ToLookupTable();
 
-        public static LookupTable<Clan> Clans => new(Clan.All);
+        public static ILookupTable<Clan> Clans => Clan.All.ToLookupTable();
 
-        public static LookupTable<Hero> Heroes => new(Hero.All);
+        public static ILookupTable<Hero> Heroes => Hero.All.ToLookupTable();
 
-        public static LookupTable<Hero> Nobles => new(Heroes.Where(hero => hero.IsNoble));
+        public static ILookupTable<Hero> Nobles => Heroes.Where(hero => hero.IsNoble).ToLookupTable();
 
-        public static LookupTable<Hero> Wanderers => new(Heroes.Where(hero => hero.IsWanderer));
+        public static ILookupTable<Hero> Wanderers => Heroes.Where(hero => hero.IsWanderer).ToLookupTable();
 
-        public static LookupTable<Settlement> Settlements => new(Settlement.All);
+        public static ILookupTable<Settlement> Settlements => Settlement.All.ToLookupTable();
 
-        public static LookupTable<Town> Fiefs => new(Town.AllFiefs);
+        public static ILookupTable<Town> Fiefs => Town.AllFiefs.ToLookupTable();
 
-        public static LookupTable<Town> Towns => new(Town.AllTowns);
+        public static ILookupTable<Town> Towns => Town.AllTowns.ToLookupTable();
 
-        public static LookupTable<Town> Castles => new(Town.AllCastles);
+        public static ILookupTable<Town> Castles => Town.AllCastles.ToLookupTable();
 
-        public static LookupTable<Village> Villages => new(Village.All);
+        public static ILookupTable<Village> Villages => Village.All.ToLookupTable();
 
-        public static LookupTable<MobileParty> Parties => new(MobileParty.All);
+        public static ILookupTable<MobileParty> Parties => MobileParty.All.ToLookupTable();
 
-        public static Hero[] Descendants(this Hero hero) {
+        public static ILookupTable<Hero> Descendants(this Hero hero) {
             IEnumerable<Hero> GetDescendants(Hero hero) {
                 foreach (var child in hero.Children) {
                     yield return child;
@@ -39,11 +39,11 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                     }
                 }
             }
-            return GetDescendants(hero).ToArray();
+            return GetDescendants(hero).ToLookupTable();
         }
 
-        public static Hero[] Friends(this Hero hero) => Heroes[other => other.IsFriend(hero)];
+        public static ILookupTable<Hero> Friends(this Hero hero) => Heroes[other => other.IsFriend(hero)];
 
-        public static Hero[] Enemies(this Hero hero) => Heroes[other => other.IsEnemy(hero)];
+        public static ILookupTable<Hero> Enemies(this Hero hero) => Heroes[other => other.IsEnemy(hero)];
     }
 }
