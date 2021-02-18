@@ -14,9 +14,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static ILookupTable<Hero> Heroes => Hero.All.ToLookupTable();
 
-        public static ILookupTable<Hero> Nobles => Heroes.Where(hero => hero.IsNoble).ToLookupTable();
+        public static ILookupTable<Hero> Nobles => Heroes[hero => hero.IsNoble];
 
-        public static ILookupTable<Hero> Wanderers => Heroes.Where(hero => hero.IsWanderer).ToLookupTable();
+        public static ILookupTable<Hero> Wanderers => Heroes[hero => hero.IsWanderer];
 
         public static ILookupTable<Settlement> Settlements => Settlement.All.ToLookupTable();
 
