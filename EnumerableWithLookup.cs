@@ -1,9 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TaleWorlds.CampaignSystem;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-    public struct EnumerableWithLookup<T> : IEnumerable<T> {
+    public struct EnumerableWithLookup<T> : ILookupTable<T>
+        where T : class {
+
         private readonly IEnumerable<T> source;
 
         public EnumerableWithLookup(IEnumerable<T> source) {

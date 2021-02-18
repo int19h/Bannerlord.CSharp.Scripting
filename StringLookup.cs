@@ -8,10 +8,8 @@
 
         public override string ToString() => s;
 
-        public static implicit operator string(StringLookup lookup) => lookup.ToString();
-
-        public override bool Matches<T>(T x) => this == Key(x);
-
         protected abstract string? Key<T>(T x);
+
+        public override bool Matches<T>(T x) => Key(x) == s;
     }
 }
