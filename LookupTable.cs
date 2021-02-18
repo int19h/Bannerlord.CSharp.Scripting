@@ -7,6 +7,8 @@ using TaleWorlds.CampaignSystem;
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public interface ILookupTable<out T> : IEnumerable<T> {
         T this[Lookup lookup] { get; }
+
+        T[] this[Predicate<T> predicate] { get; }
     }
 
     public struct LookupTable<T> : ILookupTable<T>
@@ -43,6 +45,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 return lookups.Select(lookup => self[lookup]).ToArray();
             }
         }
+
+        public T[] this[Predicate<T> include] => this.Where(item => include(item)).ToArray();
     }
 
     internal struct LookupTables {

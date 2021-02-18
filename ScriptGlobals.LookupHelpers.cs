@@ -30,17 +30,20 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static LookupTable<MobileParty> Parties => new(MobileParty.All);
 
-        public static IEnumerable<Hero> Descendants(this Hero hero) {
-            foreach (var child in hero.Children) {
-                yield return child;
-                foreach (var descendant in child.Descendants()) {
-                    yield return descendant;
+        public static Hero[] Descendants(this Hero hero) {
+            IEnumerable<Hero> GetDescendants(Hero hero) {
+                foreach (var child in hero.Children) {
+                    yield return child;
+                    foreach (var descendant in GetDescendants(hero)) {
+                        yield return descendant;
+                    }
                 }
             }
+            return GetDescendants(hero).ToArray();
         }
 
-        public static IEnumerable<Hero> Friends(this Hero hero) => Heroes.Where(other => other.IsFriend(hero));
+        public static Hero[] Friends(this Hero hero) => Heroes[other => other.IsFriend(hero)];
 
-        public static IEnumerable<Hero> Enemies(this Hero hero) => Heroes.Where(other => other.IsEnemy(hero));
+        public static Hero[] Enemies(this Hero hero) => Heroes[other => other.IsEnemy(hero)];
     }
 }
