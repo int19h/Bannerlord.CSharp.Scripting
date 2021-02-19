@@ -1,13 +1,9 @@
 ﻿using System;
-using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections;
-using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
