@@ -19,7 +19,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             => new LookupTable<T>(items);
     }
 
-    internal class LookupTable<T> : ILookupTable<T>
+    public class LookupTable<T> : ILookupTable<T>
         where T : class {
 
         private readonly T[] items;

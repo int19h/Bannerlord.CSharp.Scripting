@@ -1,54 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
-using static Int19h.Bannerlord.CSharp.Scripting.Helpers;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-    public static class ScriptArgument {
-        private static ScalarScriptArgument<T> Create<T>(T value) where T : notnull
-            => new(value);
+    public class ScriptArgument {
+        protected readonly object?[] Values;
 
-        public static dynamic? Wrap(dynamic? value) {
-            if (value is null) {
-                return null;
-            } else if (value is string or Lookup) {
-                return Create(value);
-            } else if (value is ITuple tuple) {
-                dynamic arg = Create(value);
-                for (int i = 0; i < tuple.Length; ++i) {
-                    dynamic item = tuple[i];
-                    if (item is null) {
-                        arg = arg.RestrictByNull();
-                    } else if (item is IEnumerable<object> xs) {
-                        foreach (dynamic x in xs) {
-                            arg = arg.RestrictBy(x);
-                        }
-                    } else {
-                        arg = arg.RestrictBy(item);
+        protected ScriptArgument(object?[] values) {
+            Trace.Assert(values.Length > 0);
+            Values = values;
+        }
+
+        private static IEnumerable<object?> Flatten(object value) {
+            switch (value) {
+                case IEnumerable<object?> xs:
+                    foreach (var x in xs) {
+                        yield return x;
                     }
-                }
-                return arg;
-            } else {
-                return value;
+                    break;
+                case ITuple tuple:
+                    for (int i = 0; i < tuple.Length; ++i) {
+                        foreach (var x in Flatten(tuple[i])) {
+                            yield return x;
+                        }
+                    }
+                    break;
+                default:
+                    yield return value;
+                    break;
             }
         }
-    }
 
-    public class ScriptArgument<T>
-        where T : notnull {
+        public static ScriptArgument? Create(object? value) {
+            if (value is null) {
+                return null;
+            }
 
-
-        public readonly T Value;
-
-        public ScriptArgument(T value) {
-            Value = value;
+            var items = Flatten(value).ToArray();
+            dynamic arg =
+                items.Length == 1 && items[0] is var x and not null ?
+                new UnrestrictedScriptArgument.Scalar(x) :
+                new UnrestrictedScriptArgument(items);
+            foreach (dynamic? item in items) {
+                arg = arg.RestrictBy(item);
+            }
+            return arg;
         }
 
-        protected static TTarget LookUp<TTarget>(dynamic value) {
-            if (IsAssignableTo<TTarget>(value)) {
-                return value;
+        private static ValueTuple<TTarget>? Convert<TTarget>(object value) => null;
+
+        private static ValueTuple<TTarget>? Convert<TTarget>(TTarget value) => ValueTuple.Create(value);
+
+        protected static TTarget? LookUp<TTarget>(object? value) {
+            if (value is null) {
+                return (TTarget?)value;
+            } else if (Convert((dynamic)value) is ValueTuple<TTarget> result) {
+                return result.Item1;
             }
 
             if (LookupTables.Get<TTarget>() is var table and not null) {
@@ -60,139 +70,186 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 }
             }
 
-            throw new InvalidCastException();
+            throw new InvalidOperationException($"Invalid {typeof(TTarget).Name} lookup: {value}");
         }
 
-        protected static TTarget[] LookUpMany<TTarget>(object value) {
-            if (value is not ITuple tuple || LookupTables.Get<TTarget>() == null) {
-                return new[] { LookUp<TTarget>(value) };
-            }
+        protected TTarget?[] LookUp<TTarget>()
+            => Values.Select(value => LookUp<TTarget>(value)).ToArray();
 
-            IEnumerable<TTarget> Unpack() {
-                for (int i = 0; i < tuple.Length; ++i) {
-                    var item = tuple[i];
-                    if (item is IEnumerable<TTarget> xs) {
-                        foreach (var x in xs) {
-                            yield return x;
-                        }
-                    } else {
-                        yield return LookUp<TTarget>(item);
-                    }
-                }
-            }
+        internal dynamic RestrictBy(object? o) => new ScriptArgument(Values);
 
-            return Unpack().ToArray();
+        internal dynamic RestrictBy(string s) => this;
+
+        internal dynamic RestrictBy(Lookup lookup) => this;
+
+        public class Scalar : ScriptArgument {
+            internal Scalar(object value) : base(new[] { value }) { }
+
+            internal object Value => Values[0]!;
         }
-
-        public static implicit operator T[](ScriptArgument<T> arg) => LookUpMany<T>(arg.Value);
-
-        internal ScriptArgument<T> RestrictBy<TOther>(TOther item) => new(Value);
-
-        internal ScriptArgument<T> RestrictBy(string s) => this;
-
-        internal ScriptArgument<T> RestrictBy(Lookup lookup) => this;
-
-        internal ScriptArgument<T> RestrictByNull() => this;
     }
 
-    public class ScriptArgument<T, T1> : ScriptArgument<T>
-        where T : notnull {
+    public class ScriptArgument<T1> : ScriptArgument { 
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T1?[](ScriptArgument<T1> arg) => arg.LookUp<T1>();
 
-        public static implicit operator T1[](ScriptArgument<T, T1> arg) => LookUpMany<T1>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T1> RestrictBy(T1 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T1 item) => new ScriptArgument<T1>(Values);
+
+        public new class Scalar : ScriptArgument.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T1?(ScriptArgument<T1>.Scalar arg) => LookUp<T1>(arg.Value);
+
+            public static implicit operator T1?[](ScriptArgument<T1>.Scalar arg) => arg.LookUp<T1>();
+        }
     }
 
-    public class ScriptArgument<T, T1, T2> : ScriptArgument<T, T1>
-        where T : notnull {
+    public class ScriptArgument<T1, T2> : ScriptArgument<T1> {
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T2?[](ScriptArgument<T1, T2> arg) => arg.LookUp<T2>();
 
-        public static implicit operator T2[](ScriptArgument<T, T1, T2> arg) => LookUpMany<T2>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T2> RestrictBy(T2 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T2 item) => new ScriptArgument<T2>(Values);
+
+        public new class Scalar : ScriptArgument<T1>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T2?(ScriptArgument<T1, T2>.Scalar arg) => LookUp<T2>(arg.Value);
+
+            public static implicit operator T2?[](ScriptArgument<T1, T2>.Scalar arg) => arg.LookUp<T2>();
+        }
     }
 
-    public class ScriptArgument<T, T1, T2, T3> : ScriptArgument<T, T1, T2>
-        where T : notnull {
+    public class ScriptArgument<T1, T2, T3> : ScriptArgument<T1, T2> {
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T3?[](ScriptArgument<T1, T2, T3> arg) => arg.LookUp<T3>();
 
-        public static implicit operator T3[](ScriptArgument<T, T1, T2, T3> arg) => LookUpMany<T3>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T3> RestrictBy(T3 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T3 item) => new ScriptArgument<T3>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T3?(ScriptArgument<T1, T2, T3>.Scalar arg) => LookUp<T3>(arg.Value);
+
+            public static implicit operator T3?[](ScriptArgument<T1, T2, T3>.Scalar arg) => arg.LookUp<T3>();
+        }
     }
 
-    public class ScriptArgument<T, T1, T2, T3, T4> : ScriptArgument<T, T1, T2, T3>
-        where T : notnull {
+    public class ScriptArgument<T1, T2, T3, T4> : ScriptArgument<T1, T2, T3> {
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T4?[](ScriptArgument<T1, T2, T3, T4> arg) => arg.LookUp<T4>();
 
-        public static implicit operator T4[](ScriptArgument<T, T1, T2, T3, T4> arg) => LookUpMany<T4>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T4> RestrictBy(T4 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T4 item) => new ScriptArgument<T4>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2, T3>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T4?(ScriptArgument<T1, T2, T3, T4>.Scalar arg) => LookUp<T4>(arg.Value);
+
+            public static implicit operator T4?[](ScriptArgument<T1, T2, T3, T4>.Scalar arg) => arg.LookUp<T4>();
+        }
     }
 
-    public class ScriptArgument<T, T1, T2, T3, T4, T5> : ScriptArgument<T, T1, T2, T3, T4>
-        where T : notnull {
+    public class ScriptArgument<T1, T2, T3, T4, T5> : ScriptArgument<T1, T2, T3, T4> {
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T5?[](ScriptArgument<T1, T2, T3, T4, T5> arg) => arg.LookUp<T5>();
 
-        public static implicit operator T5[](ScriptArgument<T, T1, T2, T3, T4, T5> arg) => LookUpMany<T5>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T5> RestrictBy(T5 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T5 item) => new ScriptArgument<T5>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2, T3, T4>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T5?(ScriptArgument<T1, T2, T3, T4, T5>.Scalar arg) => LookUp<T5>(arg.Value);
+
+            public static implicit operator T5?[](ScriptArgument<T1, T2, T3, T4, T5>.Scalar arg) => arg.LookUp<T5>();
+        }
     }
 
-    public class ScriptArgument<T, T1, T2, T3, T4, T5, T6> : ScriptArgument<T, T1, T2, T3, T4, T5>
-        where T : notnull {
+    public class ScriptArgument<T1, T2, T3, T4, T5, T6> : ScriptArgument<T1, T2, T3, T4, T5> {
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T6?[](ScriptArgument<T1, T2, T3, T4, T5, T6> arg) => arg.LookUp<T6>();
 
-        public static implicit operator T6[](ScriptArgument<T, T1, T2, T3, T4, T5, T6> arg) => LookUpMany<T6>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T6> RestrictBy(T6 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T6 item) => new ScriptArgument<T6>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2, T3, T4, T5>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T6?(ScriptArgument<T1, T2, T3, T4, T5, T6>.Scalar arg) => LookUp<T6>(arg.Value);
+
+            public static implicit operator T6?[](ScriptArgument<T1, T2, T3, T4, T5, T6>.Scalar arg) => arg.LookUp<T6>();
+        }
     }
 
-    public class ScriptArgument<T, T1, T2, T3, T4, T5, T6, T7> : ScriptArgument<T, T1, T2, T3, T4, T5, T6>
-        where T : notnull {
+    public class ScriptArgument<T1, T2, T3, T4, T5, T6, T7> : ScriptArgument<T1, T2, T3, T4, T5, T6> {
+        internal ScriptArgument(object?[] values) : base(values) { }
 
-        public ScriptArgument(T value) : base(value) { }
+        public static implicit operator T7?[](ScriptArgument<T1, T2, T3, T4, T5, T6, T7> arg) => arg.LookUp<T7>();
 
-        public static implicit operator T7[](ScriptArgument<T, T1, T2, T3, T4, T5, T6, T7> arg) => LookUpMany<T7>(arg.Value);
+        internal new dynamic RestrictBy(string s) => this;
 
-        internal ScriptArgument<T, T7> RestrictBy(T7 item) => new(Value);
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T7 item) => new ScriptArgument<T7>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2, T3, T4, T5, T6>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T7?(ScriptArgument<T1, T2, T3, T4, T5, T6, T7>.Scalar arg) => LookUp<T7>(arg.Value);
+
+            public static implicit operator T7?[](ScriptArgument<T1, T2, T3, T4, T5, T6, T7>.Scalar arg) => arg.LookUp<T7>();
+        }
     }
 
-    public class UniversalScriptArgument<T> : ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty>
-        where T : notnull {
-        public UniversalScriptArgument(T value) : base(value) { }
-    }
+    internal class UnrestrictedScriptArgument : ScriptArgument<Kingdom, Clan, Hero, Town, Village, MobileParty> {
+        internal UnrestrictedScriptArgument(object?[] values) : base(values) { }
 
-    public class ScalarScriptArgument<T> : UniversalScriptArgument<T>
-        where T : notnull {
+        private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty>(Values);
 
-        public ScalarScriptArgument(T value) : base(value) { }
+        internal new dynamic RestrictBy(string s) => Unrestricted<string>();
 
-        public static implicit operator T(ScalarScriptArgument<T> arg) => arg.Value;
+        internal new dynamic RestrictBy(Lookup lookup) => Unrestricted<Lookup>();
 
-        public static implicit operator Kingdom(ScalarScriptArgument<T> arg) => ((Kingdom[])arg)[0];
+        internal dynamic RestrictBy<T>(T value) => new ScriptArgument<T>(Values);
 
-        public static implicit operator Clan(ScalarScriptArgument<T> arg) => ((Clan[])arg)[0];
+        public new class Scalar : ScriptArgument<Kingdom, Clan, Hero, Town, Village, MobileParty>.Scalar {
+            public Scalar(object value) : base(value) { }
 
-        public static implicit operator Hero(ScalarScriptArgument<T> arg) => ((Hero[])arg)[0];
+            private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty>.Scalar(Value);
 
-        public static implicit operator Town(ScalarScriptArgument<T> arg) => ((Town[])arg)[0];
+            internal new dynamic RestrictBy(string s) => Unrestricted<string>();
 
-        public static implicit operator Village(ScalarScriptArgument<T> arg) => ((Village[])arg)[0];
+            internal new dynamic RestrictBy(Lookup lookup) => Unrestricted<Lookup>();
 
-        public static implicit operator MobileParty(ScalarScriptArgument<T> arg) => ((MobileParty[])arg)[0];
-
-        internal new UniversalScriptArgument<T> RestrictBy(string s) => new(Value);
-
-        internal new UniversalScriptArgument<T> RestrictBy(Lookup lookup) => new(Value);
-
-        internal new UniversalScriptArgument<T> RestrictByNull() => new(Value);
+            internal dynamic RestrictBy<T>(T value) => new ScriptArgument<T>.Scalar(Value);
+        }
     }
 }

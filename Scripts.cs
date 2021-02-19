@@ -54,7 +54,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             var invoker = (Action<object?[]>)CSharpScript.EvaluateAsync(code.ToString(), GetScriptOptions()).GetAwaiter().GetResult();
             var oldScriptPath = ScriptGlobals.ScriptPath;
             ScriptGlobals.ScriptPath = fileName;
-            args = args.Select(arg => ScriptArgument.Wrap(arg)).ToArray();
+            args = args.Select(arg => ScriptArgument.Create(arg)).ToArray();
             try {
                 invoker(args);
                 return true;
