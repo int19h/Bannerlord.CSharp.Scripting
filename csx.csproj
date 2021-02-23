@@ -26,6 +26,7 @@
     <None Remove="Config.Default.xml" />
     <None Remove="Scripts\always_pregnant.csx" />
     <None Remove="Scripts\build_all.csx" />
+    <None Remove="Scripts\Clan%28%29.csx" />
     <None Remove="Scripts\clear_notifications.csx" />
     <None Remove="Scripts\clear_tracks.csx" />
     <None Remove="Scripts\disband_garrisons.csx" />
@@ -50,6 +51,7 @@
     <EmbeddedResource Include="Config.Default.xml" />
     <EmbeddedResource Include="Scripts\always_pregnant.csx" />
     <EmbeddedResource Include="Scripts\build_all.csx" />
+    <EmbeddedResource Include="Scripts\Clan().csx" />
     <EmbeddedResource Include="Scripts\clear_notifications.csx" />
     <EmbeddedResource Include="Scripts\clear_tracks.csx" />
     <EmbeddedResource Include="Scripts\disband_garrisons.csx" />
@@ -104,7 +106,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!--PackageReference Include="Newtonsoft.Json" Version="11.0.2" PrivateAssets="All" /-->
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <Version>3.0.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
