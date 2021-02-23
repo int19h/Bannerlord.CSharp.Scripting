@@ -34,9 +34,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
         }
 
-        public static ScriptArgument? Create(object? value) {
-            if (value is null) {
-                return null;
+        public static object? Create(object? value) {
+            if (value is null or IDataStore) {
+                return value;
             }
 
             var items = Flatten(value).ToArray();

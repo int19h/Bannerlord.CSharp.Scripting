@@ -81,7 +81,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             args = args.Select(arg => ScriptArgument.Create(arg)).ToArray();
             try {
                 invoker(args);
-                return true;
+                return null;
             } catch (TargetInvocationException ex) {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
                 throw;
