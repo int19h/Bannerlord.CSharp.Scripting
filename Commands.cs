@@ -33,7 +33,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             string.Join(" ", args).Replace('\'', '"').Replace(".,", ";");
 
         [CommandLineFunctionality.CommandLineArgumentFunction("help", "csx")]
-        public static string Help (List<string> args) => WithErrorHandling(output => {
+        public static string Help(List<string> args) => WithErrorHandling(output => {
             if (args.Count != 0) {
                 throw new CommandException("Usage: csx.help");
             }
@@ -113,7 +113,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             var scriptName = args[0];
             string? fileName = null;
             string code;
-            if (Regex.IsMatch(scriptName, @"^\w+\(")) {
+            if (Regex.IsMatch(scriptName, @"^[A-Za-z0-9_.]+\(")) {
                 code = ToCode(args.Prepend("Scripts."));
             } else {
                 fileName = ScriptFiles.GetFileName(scriptName);
