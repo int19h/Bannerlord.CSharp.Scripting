@@ -24,23 +24,7 @@
 
   <ItemGroup>
     <None Remove="Config.Default.xml" />
-    <None Remove="Scripts\always_pregnant.csx" />
-    <None Remove="Scripts\build_all.csx" />
-    <None Remove="Scripts\Clan%28%29.csx" />
-    <None Remove="Scripts\clear_notifications.csx" />
-    <None Remove="Scripts\clear_tracks.csx" />
-    <None Remove="Scripts\disband_garrisons.csx" />
-    <None Remove="Scripts\feed_all_settlements.csx" />
-    <None Remove="Scripts\get_all_perks.csx" />
-    <None Remove="Scripts\grow_villages.csx" />
-    <None Remove="Scripts\kill_all_bandits.csx" />
-    <None Remove="Scripts\kill_all_nobles.csx" />
-    <None Remove="Scripts\omnisharp.json" />
-    <None Remove="Scripts\settlement_values.csx" />
-    <None Remove="Scripts\ShowFiefValues%28%29.csx" />
-    <None Remove="Scripts\superclan.csx" />
-    <None Remove="Scripts\test.csx" />
-    <None Remove="Scripts\world_revolution.csx" />
+    <None Remove="Scripts\*.*" />
     <None Include="LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -49,23 +33,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Config.Default.xml" />
-    <EmbeddedResource Include="Scripts\always_pregnant.csx" />
-    <EmbeddedResource Include="Scripts\build_all.csx" />
-    <EmbeddedResource Include="Scripts\Clan().csx" />
-    <EmbeddedResource Include="Scripts\clear_notifications.csx" />
-    <EmbeddedResource Include="Scripts\clear_tracks.csx" />
-    <EmbeddedResource Include="Scripts\disband_garrisons.csx" />
-    <EmbeddedResource Include="Scripts\feed_all_settlements.csx" />
-    <EmbeddedResource Include="Scripts\get_all_perks.csx" />
-    <EmbeddedResource Include="Scripts\grow_villages.csx" />
-    <EmbeddedResource Include="Scripts\kill_all_bandits.csx" />
-    <EmbeddedResource Include="Scripts\kill_all_nobles.csx" />
-    <EmbeddedResource Include="Scripts\omnisharp.json" />
-    <EmbeddedResource Include="Scripts\settlement_values.csx" />
-    <EmbeddedResource Include="Scripts\ShowFiefValues().csx" />
-    <EmbeddedResource Include="Scripts\superclan.csx" />
-    <EmbeddedResource Include="Scripts\test.csx" />
-    <EmbeddedResource Include="Scripts\world_revolution.csx" />
+    <EmbeddedResource Include="Scripts\*.*" />
   </ItemGroup>
 
   <ItemGroup>
