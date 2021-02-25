@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
@@ -7,6 +8,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         private static LogWriter? log;
 
         public static readonly dynamic Scripts = new Scripts();
+
+        public static readonly dynamic Shared = new ExpandoObject();
 
         public static string? ScriptPath { get; internal set; }
 
