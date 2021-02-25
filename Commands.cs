@@ -66,7 +66,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             var code = ToCode(args);
             try {
-                ScriptGlobals.Prepare(output, null, null);
+                ScriptGlobals.Prepare(output, null);
                 evalState = evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();
@@ -107,29 +107,13 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         [CommandLineFunctionality.CommandLineArgumentFunction("run", "csx")]
         public static string Run(List<string> args) => WithErrorHandling(output => {
             if (args.Count < 1) {
-                throw new CommandException("Usage: csx.run <script-name> [<args>...]");
+                throw new CommandException("Usage: csx.run <script>[.<function>]([<args>...])");
             }
 
-            var scriptName = args[0];
-            string? fileName = null;
-            string code;
-            if (Regex.IsMatch(scriptName, @"^[A-Za-z0-9_.]+\(")) {
-                code = ToCode(args.Prepend("Scripts."));
-            } else {
-                fileName = ScriptFiles.GetFileName(scriptName);
-                if (fileName == null) {
-                    throw new CommandException($"Script not found: {scriptName}");
-                }
-                args.RemoveAt(0);
-                code = $"#load \"{fileName}\"";
-            }
-
+            var code = ToCode(args.Prepend("Scripts."));
             try {
-                ScriptGlobals.Prepare(output, fileName, args);
-                var result = CSharpScript.EvaluateAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
-                if (result != null) {
-                    ScriptGlobals.Log.Write(result);
-                }
+                ScriptGlobals.Prepare(output, null);
+                CSharpScript.EvaluateAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
             } finally {
                 ScriptGlobals.Cleanup();
             }
