@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using TaleWorlds.CampaignSystem;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
