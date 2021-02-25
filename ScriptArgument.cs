@@ -236,7 +236,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         internal new dynamic RestrictBy(string s) => Unrestricted<string>();
 
-        internal new dynamic RestrictBy(Lookup lookup) => Unrestricted<Lookup>();
+        internal dynamic RestrictBy(NameLookup lookup) => Unrestricted<NameLookup>();
+
+        internal dynamic RestrictBy(IdLookup lookup) => Unrestricted<IdLookup>();
 
         internal dynamic RestrictBy<T>(T value) => new ScriptArgument<T>(Values);
 
@@ -247,7 +249,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
             internal new dynamic RestrictBy(string s) => Unrestricted<string>();
 
-            internal new dynamic RestrictBy(Lookup lookup) => Unrestricted<Lookup>();
+            internal dynamic RestrictBy(NameLookup lookup) => Unrestricted<NameLookup>();
+
+            internal dynamic RestrictBy(IdLookup lookup) => Unrestricted<IdLookup>();
 
             internal dynamic RestrictBy<T>(T value) => new ScriptArgument<T>.Scalar(Value);
         }
