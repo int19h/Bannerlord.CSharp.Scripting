@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
-
     [DataContract]
     internal class OmniSharpConfig {
         private static readonly DataContractJsonSerializer serializer = new(typeof(OmniSharpConfig));
