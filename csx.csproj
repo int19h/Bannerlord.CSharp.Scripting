@@ -37,6 +37,60 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Scripts\CampaignBehavior.csx" />
+    <EmbeddedResource Remove="Scripts\CampaignEvents.csx" />
+    <EmbeddedResource Remove="Scripts\ClearNotifications.csx" />
+    <EmbeddedResource Remove="Scripts\ClearPersuasion.csx" />
+    <EmbeddedResource Remove="Scripts\ClearTracks.csx" />
+    <EmbeddedResource Remove="Scripts\Fief.csx" />
+    <EmbeddedResource Remove="Scripts\Hero.csx" />
+    <EmbeddedResource Remove="Scripts\MyClan.csx" />
+    <EmbeddedResource Remove="Scripts\Party.csx" />
+    <EmbeddedResource Remove="Scripts\Test.csx" />
+    <EmbeddedResource Remove="Scripts\Village.csx" />
+    <EmbeddedResource Remove="Scripts\_Helpers.csx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Scripts\CampaignBehavior.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\CampaignEvents.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\ClearNotifications.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\ClearPersuasion.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\ClearTracks.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Fief.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Hero.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\MyClan.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Party.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Test.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Village.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\lib\Helpers.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.CampaignSystem.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
@@ -82,6 +136,9 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting">
       <Version>2.10.0</Version>
     </PackageReference>
-
   </ItemGroup>
+
+  <PropertyGroup>
+    <PostBuildCopyToModulesRegex>.*\.csx|$(PostBuildCopyToModulesRegex)</PostBuildCopyToModulesRegex>
+  </PropertyGroup>
 </Project>

@@ -1,4 +1,4 @@
-#load "_Helpers.csx"
+#load "lib/Helpers.csx"
 
 /// <summary>
 /// Lists all living members of the clan, grouped by their culture.

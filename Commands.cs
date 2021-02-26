@@ -91,11 +91,21 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.list");
             }
 
-            output.WriteLine($"@ {ScriptFiles.Location}:");
-            foreach (var name in ScriptFiles.Enumerate()) {
-                output.WriteLine(name);
+            foreach (var path in Scripts.GetSearchPaths()) {
+                string[] fileNames;
+                try {
+                    fileNames = Directory.GetFiles(path, "*.csx");
+                } catch (Exception) {
+                    continue;
+                }
+
+                output.WriteLine($"@ {path}:");
+                foreach (var fileName in fileNames) {
+                    var scriptName = Path.GetFileNameWithoutExtension(fileName);
+                    output.WriteLine($"  {scriptName}");
+                }
+                output.WriteLine();
             }
-            output.WriteLine();
         });
     }
 
