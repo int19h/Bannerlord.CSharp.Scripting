@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using TaleWorlds.CampaignSystem;
+﻿using TaleWorlds.CampaignSystem;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     partial class ScriptGlobals {

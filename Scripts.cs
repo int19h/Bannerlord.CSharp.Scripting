@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CSharp;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public class Scripts : DynamicObject {
@@ -52,8 +50,6 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         }
 
         private object? Invoke(string funcName, CallInfo callInfo, object?[] args) {
-            var provider = new CSharpCodeProvider();
-            var codegenOptions = new CodeGeneratorOptions();
             var code = new StringWriter();
             code.WriteLine($"#load \"{fileName}\"");
 
