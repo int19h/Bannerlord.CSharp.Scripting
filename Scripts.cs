@@ -27,23 +27,22 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
     }
 
     public class Script : DynamicObject {
-        private readonly string name;
         private readonly string fileName;
 
-        public Script(string name) {
-            this.name = name;
+        private string Name { get; }
 
-            if (ScriptFiles.GetFileName(ScriptName) is var fileName and not null) {
+        public Script(string name) {
+            Name = name;
+
+            if (ScriptFiles.GetFileName(Name) is var fileName and not null) {
                 this.fileName = fileName;
             } else { 
-                throw new FileNotFoundException($"Function script not found: {ScriptName}");
+                throw new FileNotFoundException($"Function script not found: {Name}");
             }
         }
 
-        private string ScriptName => $"{name}()";
-
         public override bool TryInvoke(InvokeBinder binder, object?[] args, out object? result) {
-            result = Invoke(name, binder.CallInfo, args);
+            result = Invoke(Name, binder.CallInfo, args);
             return true;
         }
 
@@ -75,7 +74,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
             code.WriteLine("));");
 
-            var invoker = (Action<object?[]>)CSharpScript.EvaluateAsync(code.ToString(), Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+            var invoker = (Action<object?[]>)CSharpScript.EvaluateAsync(code.ToString(), Scripts.GetScriptOptions())
+                .GetAwaiter().GetResult();
             var oldScriptPath = ScriptGlobals.ScriptPath;
             ScriptGlobals.ScriptPath = fileName;
             args = args.Select(arg => ScriptArgument.Create(arg)).ToArray();

@@ -81,6 +81,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         public static string Edit(List<string> args) =>
             Eval(args.Prepend("Edit(").Append(")").ToList());
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("run", "csx")]
+        public static string Run(List<string> args) =>
+            Eval(args.Prepend("Scripts.").ToList());
+
         [CommandLineFunctionality.CommandLineArgumentFunction("list", "csx")]
         public static string List(List<string> args) => WithErrorHandling(output => {
             if (args.Count != 0) {
@@ -88,34 +92,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
 
             output.WriteLine($"@ {ScriptFiles.Location}:");
-            output.WriteLine();
-
-            var funcScripts = ScriptFiles.Enumerate().Where(s => s.EndsWith("()"));
-            foreach (var line in funcScripts.OrderBy(s => s)) {
-                output.WriteLine(line);
+            foreach (var name in ScriptFiles.Enumerate()) {
+                output.WriteLine(name);
             }
             output.WriteLine();
-
-            var commandScripts = ScriptFiles.Enumerate().Except(funcScripts);
-            foreach (var line in commandScripts.OrderBy(s => s)) {
-                output.WriteLine(line);
-            }
-            output.WriteLine();
-        });
-
-        [CommandLineFunctionality.CommandLineArgumentFunction("run", "csx")]
-        public static string Run(List<string> args) => WithErrorHandling(output => {
-            if (args.Count < 1) {
-                throw new CommandException("Usage: csx.run <script>[.<function>]([<args>...])");
-            }
-
-            var code = ToCode(args.Prepend("Scripts."));
-            try {
-                ScriptGlobals.Prepare(output, null);
-                CSharpScript.EvaluateAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
-            } finally {
-                ScriptGlobals.Cleanup();
-            }
         });
     }
 
