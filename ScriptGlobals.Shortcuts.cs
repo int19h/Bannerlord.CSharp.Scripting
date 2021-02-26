@@ -17,7 +17,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static ILookupTable<Town> MyCastles => MyFiefs[fief => fief.IsCastle];
 
-        public static Village[] MyVillages => Me.Clan.Villages.ToArray();
+        public static ILookupTable<Village> MyVillages => Me.Clan.Villages.ToLookupTable();
 
         public static Hero? MySpouse => Me.Spouse;
 
