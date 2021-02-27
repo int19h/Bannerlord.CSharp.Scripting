@@ -34,8 +34,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
         }
 
-        public static object? Create(object? value) {
-            if (value is null or IDataStore) {
+        public static object? Wrap(object? value) {
+            if (value is null or All or IDataStore) {
                 return value;
             }
 

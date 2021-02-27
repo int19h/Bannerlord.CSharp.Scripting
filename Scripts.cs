@@ -133,7 +133,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 .GetAwaiter().GetResult();
             var oldScriptPath = ScriptGlobals.ScriptPath;
             ScriptGlobals.ScriptPath = FileName;
-            args = args.Select(arg => ScriptArgument.Create(arg)).ToArray();
+            args = args.Select(arg => ScriptArgument.Wrap(arg)).ToArray();
             try {
                 invoker(args);
                 return null;
