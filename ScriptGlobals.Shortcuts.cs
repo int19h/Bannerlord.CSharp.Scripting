@@ -4,6 +4,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
     partial class ScriptGlobals {
         public static string CampaignId => Campaign.Current.UniqueGameId;
 
+        public static CampaignTime Now => CampaignTime.Now;
+
         public static Hero Me => Hero.MainHero;
 
         public static Clan MyClan => Me.Clan;
