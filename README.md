@@ -4,145 +4,360 @@ This mod for [M&B2: Bannerlord](https://www.taleworlds.com/en/Games/Bannerlord) 
 
 ## Prerequisites
 
-The mod is tested with Bannerlord e1.5.6 and e1.5.7 beta. Older versions of the game *may* work, but are considered unsupported.
+The mod is tested with Bannerlord e1.5.7 and e1.5.8 beta. Older versions of the game *may* work, but are considered unsupported.
 
 There are no known compatibility issues with other Bannerlord mods. 
 
 ## Installation
 
-Download the most recent version from [Releases](https://github.com/int19h/csx/releases), and unpack it to the Modules folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
+Download the most recent version from [Releases](https://github.com/int19h/Bannerlord.CSharp.Scripting/releases), and unpack it to the Modules folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
 
 If the mod has been loaded correctly, you should see "C# Scripting" when you click Mods in the launcher.
 
-## Quick start
+## Usage
 
-This mod adds several new console commands, all under `csx` namespace. In the game, press `Alt`+`~` to activate the console. To try out the mod, first do:
-```
-# csx.list
-```
-If the mod is installed correctly, you should see output that looks something like this:
-```
-@ C:\Users\...\Documents\Mount and Blade II Bannerlord\Scripts:
+All functionality of the mod is accessible via new commands in the developer console, activated by pressing `Alt`+`~` in the game. 
 
-always_pregnant
-feed_all_settlements
-kill_all_bandits
-kill_all_nobles
-test
-world_revolution
-```
-Now try running the test script:
-```
-# csx.run test 1 2 3
-```
-You should see:
-```
-Arguments passed to this script:
-    1
-    2
-    3
-C# scripting test completed successfully.
-```
+### Evaluating C# code
 
-## Console commands
+The most basic command is `csx.eval`. It should be followed by a C# expression or statement, which is immediately evaluated. If it is an expression, and it produced a value, that value is printed out to the console. For example:
 
-### `csx.eval`
-
-Evaluates its arguments as C# code. For example:
 ```
 # csx.eval 1 + 2
 3
-```
-```
-# csx.eval Hero.MainHero.Gold = 1000000000
+
+# csx.eval Me.Gold = 1000000000
 1000000000
 ```
 
-Developer console does its own argument parsing, so `csx.eval` has to do some guesswork to reconstitute the original expression. The console replaces any sequence of spaces with a single space, strips out double quotes (`"`) entirely, and treats semicolons (`;`) as console command separators.
+Bannerlord developer console performs some idiosyncratic argument processing before handing it over to the specific command. In particular:
+- Sequences of multiple spaces are replaced with a single space.
+- Double quotes are removed.
+- Semicolons are treated as console command separators.
 
-To allow for string literals, `csx.eval` substitutes all single quotes with double quotes. Thus, you can write things like:
+Thus, `csx.eval` has to apply some substitutions to its input to allow for full access to C# language features:
+
+- Single quotes (`'`) are treated as double quotes (`"`).
+- A period followed by a comma (`.,`) is treated as a semicolon (`;`).
+
+(Note that these substitutions *only* apply to the arguments of `csx.eval`! In particular, they do *not* apply to .csx files - those use regular C# scripting syntax.)
+
+These substitutions are also made inside comments, literals etc. Thus, a string literal typed in the console as `'Foo\'s.,'` is actually `"Foo\"s;"`. If you need a single quote inside a string literal, escape it as `\u0027`. If you need the sequence `.,` inside a string literal, split it into two: `"." + ","`.
+
+Since single quotes are appropriated for string literals, they are no longer available for `char` literals. The workaround is to index a string literal, e.g.: `'A'[0]`; or to use a cast: `(char)65`.
+
+If evaluating a statement rather than an expression, it must be terminated with semicolon, per usual C# rules - which translates to `.,` in the console. So, a variable can be declared thus:
+
 ```
-# csx.eval Hero.All.Single(hero => hero.Name.ToString() == 'Liena')
-```
-On the other hand, this means that character literals are unavailable. These should rarely be needed when using Bannerlord APIs, but if necessary, the workarounds include indexing a string literal: `'A'[0]`; or casting an integer literal: `(char)65`.
-
-To allow for statements, `csx.eval` substitutes every period that are immediately followed by a comma (`.,`) with a semicolon:
-```
-# csx.eval var x = 42.,
+# csx.eval var sturgia = Kingdoms['Sturgia'].,
 ```
 
-If the sequence must appear as is, e.g. in a string literal, split it into two literals and concatenate them: `'.' + ','`.
+Variables persist between evals, and can be referenced later:
 
-(Note that these substitutions *only* apply to the arguments of `csx.eval`. In particular, it does *not* apply to `csx.run`, which uses regular C# syntax with no changes.)
+```
+# csx.eval sturgia.Fiefs.Count()
+4
+```
 
-To facilitate one-liners, the expression is evaluated in an environment in which every assembly that is loaded into the game process is automatically referenced. Furthermore, several namespaces are implicitly imported, as if with a `using` declaration:
+Persisted variables can be deleted by using `csx.reset`.
+
+### Inspecting and editing objects
+
+Two helper functions are provided to quickly inspect objects in the console.
+
+`Dump()` prints all the public properties of the object passed to it, along with their types and values. If the argument is enumerable, it is enumerated, and items are printed one by one.
+
+`Edit()` opens a new window with a .NET Windows Forms PropertyGrid control configured to edit the object passed to it. Sometimes, it may be necessary to Alt+Tab from the main game window to see the property grid. To prevent race conditions, the game is paused for as long as the editor window remains opened.
+
+ These functions are also exposed as shortcuts in the console, with `csx.dump …` equivalent to `csx.eval Dump(…)`, and `csx.edit …` equivalent to `csx.eval Edit(…)`.
+
+### Running C# scripts
+
+C# scripts are files with .csx extension that contain code in the [C# scripting dialect](https://docs.microsoft.com/en-us/archive/msdn-magazine/2016/january/essential-net-csharp-scripting). A basic Bannerlord C# script looks like this:
+```cs
+// Test.csx
+void Test(int x = 1, float y = 2) {
+    Log.WriteLine($"{x} {y}");
+}
+```
+Note that the name of the function must match the name of the file - `Test.csx` - and return type is always `void`. This script can then be executed via `csx.eval`:
+```
+# csx.eval Scripts.Test()
+1 2
+
+# csx.eval Scripts.Test(3, 4)
+3 4
+
+# csx.eval Scripts.Test(y: 5)
+1 5
+```
+`Scripts` is a "magic global" of type [dynamic](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/reference-types#the-dynamic-type) that automatically forwards method calls to the corresponding script. A console command is provided as a shortcut: `csx.run …` is equivalent to `csx.eval Scripts.…`. 
+
+To be loaded by `Scripts` or `csx.run`, .csx files must be placed in specific folders, which are searched in order:
+
+- User scripts folder, located in your Documents; usually something like
+`C:\Users\…\Documents\Mount and Blade II Bannerlord\Scripts`
+- Shared scripts folder, located where the mod is installed; usually something like `C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\CSharpScripting\bin\Win64_Shipping_Client\Scripts`
+
+The mod comes with a number of stock scripts that are placed in the shared scripts folder; these can be seen by using `csx.list`. It is not recommended to change any files in there, to simplify future mod updates. Instead, place your custom scripts in the user folder. If you want to edit a stock script, copy it to the user folder, and edit the copy - it will take precedence over the shared version.
+
+In addition to the folders above, whenever the game is running in single player campaign mode, there is also the campaign-specific scripts folder. For each campaign, Bannerlord generates a unique campaign ID, which can be accessed via `csx.eval`:
+```
+# csx.eval CampaignId
+f1561944-22af-4153-8113-560466d1c951
+```
+The corresponding campaign scripts folder is `Campaigns\<id>` under the user scripts folder. For example, for the campaign above, it would be something like `C:\Users\…\Documents\Mount and Blade II Bannerlord\Scripts\Campaigns\f1561944-22af-4153-8113-560466d1c951`
+
+The campaign folder is checked first, before the user folder. This is mainly useful for writing one-off scripts that only make sense within the context of a specific campaign, or to register campaign-specific event handlers.
+
+Scripts can define overloaded methods:
+```cs
+// Test.csx
+
+void Test(int x) {
+    Log.WriteLine($"int {x}");
+}
+
+void Test(bool b) {
+    Log.WriteLine($"bool {b}");
+}
+```
+These are resolved in the usual manner when making method calls via `dynamic`:
+```
+# csx.run Test(123)
+int 123
+
+# csx.run Test(true)
+bool True
+```
+Scripts can also define functions with different names:
+```cs
+// Test.csx
+void Foo() {
+    Log.WriteLine("Foo");
+}
+
+void Bar() {
+    Log.WriteLine("Bar");
+}
+```
+These can be invoked by specifying the method name when invoking the script:
+```
+# csx.run Test.Foo()
+Foo
+
+# csx.run Test.Bar()
+Bar
+```
+So, `Test()` is simply a short way to write `Test.Test()`.
+
+Every time the script is executed, it runs in a fresh new environment. This means that it doesn't have access to any of the variables or functions that were declared in the console via `csx.eval`, or by any previous invocation of that script or any other script. Thus, global variables are created and initialized anew every time:
+```cs
+// Test.csx
+
+int x = 0;
+
+void Test() {
+    Log.WriteLine(++x);
+}
+```
+```
+# csx.run Test()
+1
+
+# csx.run Test()
+1
+```
+
+Scripts have access to the same predefined globals as `csx.eval`. In particular, they can invoke other scripts via `Scripts`:
+
+```cs
+// OtherTest.csx
+void Foo() => Scripts.Test.Foo()
+```
+
+If you need to persist some variable between two different script runs, you can use  `Shared`, which is a [dynamic](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/reference-types#the-dynamic-type) global that references an instance of [ExpandoObject](https://docs.microsoft.com/en-us/dotnet/api/system.dynamic.expandoobject):
+
+```cs
+// Test.csx
+
+void Test() {
+    int x;
+    try {
+        x = Shared.X;
+    } catch (Exception) {
+        x = 0;
+    }
+    Shared.X = ++x;
+    Log.WriteLine(x);
+}
+```
+```
+# csx.run Test()
+1
+
+# csx.run Test()
+2
+```
+Note that this object is shared by *all* scripts, and is also accessible via `csx.eval`. 
+
+### Execution environment
+
+Both `csx.eval` and scripts are executed in a pre-populated environment. It includes assembly references for all assemblies loaded in the Bannerlord process, and implicit `using` statements for all available namespaces that begin with `TaleWorlds`, as well as the following:
 
 - `System`
 - `System.Collections.Generic`
-- `System.IO`
 - `System.Linq`
+- `System.Reflection`
 - `System.Text`
-- `TaleWorlds`
-- `TaleWorlds.CampaignSystem`
-- `TaleWorlds.CampaignSystem.Actions`
-- `TaleWorlds.Core`
-- `TaleWorlds.Library`
-- `TaleWorlds.MountAndBlade`
-- `TaleWorlds.ObjectSystem`
+- `Int19h.Bannerlord.CSharp.Scripting.ScriptGlobals`
 
-This list is configurable via `csx.xml`, located under `...\Documents\Mount and Blade II Bannerlord\Configs` - if it's not present, it will be created the first time the mod is loaded.
+The last one is a static class that serves as a mod-specific scripting API - its properties and methods become global variables and functions in the script. Some examples that were used in the code snippets earlier are `Scripts`, `Log`, and `Me`.
 
-The value produced by the evaluated expression, if any, is stringified and printed to the console.
+### Producing output
 
-Script state, including any declared variables and functions, is preserved between evaluations. Thus, it's possible to reference some object repeatedly without having to look it up every time:
-```
-# csx.eval var npc = Hero.All.Single(hero => hero.Name.ToString() == 'Liena').,
-# csx.eval npc
-Liena
-```
+Bannerlord console does not provide facilities for commands to produce output as they are running; only when they complete. For more complicated scripts, this can be fairly limited, so the mod provides an incremental logging facility that buffers output, and prints it to console when the script finishes running (even if it throws an exception). This is exposed as global variable `Log`, which is an object derived from `TextWriter` - thus, it can be used much like `Console` in console C# apps.
 
-### `csx.reset`
-Resets the script state. This effectively deletes all variables and functions previously declared using `csx.eval`.
+In addition to console output, `Log` can also write output to files. This is disabled by default, and scripts have to opt into it by calling `Log.ToFile()`. The argument, if specified, is the name of the file to write to; if not specified, the log is written to the file with the same name as the script file, but with extension .log rather than .csx. 
 
-### `csx.run`
+### Locating game objects
 
-Runs a C# script file with the specified name and arguments. The first argument is the name of the script to run, without the `.csx` extension. The remaining arguments are passed as is to the script.
+Scripts have access to the entirety of Bannerlord modding API, and can use it locate various objects in the game. For example, the `Hero` object corresponding to the main character can be obtained via `Hero.MainHero`; and the list of all heroes can be obtained via `Hero.All`.
 
-To determine the name of the script file, `.csx` extension is appended to the supplied script name, and the file is looked up in the `...\Documents\Mount and Blade II Bannerlord\Scripts` folder. For example, given:
-```
-# csx.run test
-```
-the script that is executed is `...\Documents\Mount and Blade II Bannerlord\Scripts\test.csx`. This sample script is provided with the mod.
+To make the scripts more concise and facilitate `csx.eval` one-liners, the mod provides several helpers to make this easier. First, there are several shortcuts that simply return the value of the corresponding longer expression:
 
-The `.csx` file extension reflects the fact that it's a C# *script*, not a regular application. The language is the same, but the [scripting dialect](https://docs.microsoft.com/en-us/archive/msdn-magazine/2016/january/essential-net-csharp-scripting) is more relaxed - for example, top-level variable and function declarations are allowed. The dialect is the same as used by the C# REPL in Visual Studio, and by csi.exe.
+- `CampaignId` for `Campaign.Current.UniqueGameId`
+- `Now` for `CampaignTime.Now`
+- `Me` for `Hero.MainHero`
+- `MyClan` for `Me.Clan`
+- `MyKingdom` for `Me.Clan.Kingdom`
+- `MySpouse` for `Me.Spouse`
+- `MyParty` for `Me.PartyBelongedTo`
+- `MyItems` for `MyParty.ItemRoster`
 
-Like `csx.run`, the script automatically references all assemblies that are already loaded in the game process. However, there are no implicit `using` declarations for namespaces.
-
-Any extra arguments that are passed to `csx.run` beyond the script name, are passed to the script itself via a global variable named `Arguments`, which is a read-only list of strings. Note that all the usual quirks of argument parsing in the developer console are in full force - for example, `csx.run test "foo  bar"` will result in `Arguments` consisting of two entries `"foo"` and `"bar"` (i.e. double quotes are stripped, and any sequence of spaces is treated as a single argument separator).
-
-To produce output in the console, the script should return some value once it's done. That value is stringified and printed, same as with `csx.run`:
+In addition to those, there are several *lookup tables*. A lookup table wraps some enumerable of game objects. When enumerated, it behaves the same as the original enumerable. However, it also provides indexers that can be used to look up objects by their display name:
 ```cs
-using TaleWorlds.CampaignSystem;
-Hero.MainHero.Gold = 1000000000;
-return "I'm rich!"; // printed to console
+Heroes["Rhaega"]
 ```
-Unfortunately, console in Bannerlord does not provide facilities to generate output while the script is running - only after it completed. Thus, if the script fails for any reason before `return`, you won't see the output at all. 
-
-Sometimes, however, you do want to log some information as the script is running - e.g. to determine where exactly it fails. To make this easier, the script can use the global variable named `Log`. It's a custom implementation of `TextWriter` that remembers everything that's written into it, and prints it to the console once the script completes - even if it fails with an exception. If the script successfully returns some value, it's printed after everything that was in `Log`.
-
-Some scripts produce so much output that reading it in the console is inconvenient. For such cases, `Log` also provides a way to write output to file - just call `Log.ToFile()`, and optionally provide the filename to write to. If filename is not specified, the output is written to file with the same name as the script, but extension replaced with `.log`:
+or by their `StringId`:
 ```cs
-// test.csx
-Log.WriteLine("foo");  // This is only written to game console.
-Log.ToFile();          // ... now also writing to test.log ...
-Log.WriteLine("bar");  // This is written to console and to test.log,
-return "baz";          // and so is this
+Heroes[Id("main_hero")]
+```
+or by predicate:
+```cs
+Heroes[hero => hero.Age >= 18]
+```
+The first two indexers require there to be exactly one matching object. For example, if there are two heroes named "Asha", then `Heroes["Asha"]` will throw an exception; the same happens if there is no hero with such name. The predicate indexer allows for multiple matching objects, and returns another lookup table corresponding only to those matching objects. 
+
+The following lookup tables are provided:
+
+- `Kingdoms` for `Kingdom.All`
+- `Clans` for `Clan.All`
+- `Heroes` for `Hero.All`
+- `Nobles` for `Heroes[hero => hero.IsNoble]`
+- `Wanderers` for `Heroes[hero => hero.IsWanderer]`
+- `Settlements` for `Settlement.All`
+- `Fiefs` for `Town.AllFiefs`
+- `Towns` for `Town.AllTowns`
+- `Castles` for `Town.AllCastles`
+- `Villages` for `Village.All`
+- `Parties` for `MobileParty.All`
+- `MyFiefs` for `MyClan.Fiefs`
+- `MyTowns` for `MyFiefs[fief => fief.IsTown]`
+- `MyCastles` for `MyFiefs[fief => fief.IsCastle]`
+- `MyVillages` for `MyClan.Villages`
+- `MyChildren` for `Me.Children`
+- `MyCompanions` for `MyClan.Companions`
+- `MyFamily` for `MyClan.Lords`
+
+### Script argument conversions
+
+In addition to the usual C# implicit conversions, the mod also provides implicit conversions for arguments of the following types:
+
+- `Kingdom`
+- `Clan`
+- `Hero`
+- `Town`
+- `Village`
+- `MobileParty`
+
+When invoking a script with arguments of those types, instead of passing an object, a string or `Id()` can be used; the object is then automatically looked up in the corresponding lookup table. For example:
+```cs
+// Kill.csx
+void Kill(Hero hero) {
+    KillCharacterAction.ApplyByMurder(hero);
+}
+```
+can be invoked as:
+```
+# csx.run Kill('Rhaega')
+# csx.run Kill(Id('main_hero'))
+```
+which has the same effect as:
+```
+# csx.run Kill(Heroes['Rhaega'])
+# csx.run Kill(Heroes[Id('main_hero')])
 ```
 
-### `csx.list`
+These conversions are also applied to arguments of array types. For example:
+```cs
+// Kill.csx
+void Kill(Hero[] heroes) {
+    foreach (var hero in heroes) {
+        KillCharacterAction.ApplyByMurder(hero);
+    }
+}
+```
+can *also* be invoked as:
+```
+# csx.run Kill('Rhaega')
+# csx.run Kill(Id('main_hero'))
+```
+which in this case is equivalent to:
+```
+# csx.run Kill(new[] { Heroes['Rhaega'] })
+# csx.run Kill(new[] { Heroes[Id('main_hero')] })
+```
 
-Lists the scripts available to `csx.run`. This is simply the directory listing of `...\Documents\Mount and Blade II Bannerlord\Scripts\*.csx`, with file extensions removed. It also hides any filename that starts with an underscore - by convention, leading underscore is for reusable scripts that are referenced via `#load` from other scripts.
+Furthermore, for array arguments, it's possible to pass tuples of values, mixing strings, IDs, and enumerables together - these are all concatenated into a single array of the corresponding type, looking objects up by name or ID as needed. For example (note the extra parentheses around the tuple):
+```
+# csx.run Kill(('Rhaega', Id('main_hero'), MyKingdom.Ruler, MyCompanions))
+```
+is equivalent to:
+```
+# csx.run Kill(new[] { Heroes['Rhaega'] }.Append(Heroes[Id('main_hero')]).Append(MyKingdom.Ruler).Concat(MyCompanions).ToArray())
+```
 
-## Savegame compatibility
+Global variable `All` has an unspecified type that is implicitly convertible to arrays of all of the above types, making it possible to write:
+```
+# csx.run Kill(All)
+```
 
-The mod itself does not affect saved games in any way. However, C# scripts can define custom classes, and create instances of those classes inside the game. This can break saves, because such classes cannot be deserialized later.
+### `CampaignBehavior` and `CampaignEvents`
+
+If there's a script named `CampaignBehavior`, it *must* define the following two methods:
+```cs
+// CampaignBehavior.csx
+void RegisterEvents() => …
+void SyncData(IDataStore dataStore) => …
+```
+The mod will automatically invoke those methods when the corresponding methods of its `CampaignBehavior` object are called by the game. This can be used to register handlers for various campaign events, for example:
+```cs
+// CampaignBehavior.csx
+void RegisterEvents() {
+    CampaignEvents.DailyTickEvent.AddNonSerializedListener(null, () => Scripts.CampaignEvents.DailyTick());
+}
+```
+Note that this uses `Scripts` to delegate the actual handling to another script. The advantage of this approach is that `CampaignEvents.csx` will be reloaded every time the event is fired - thus, any changes to it are reflected immediately, even after campaign is loaded. If the body of the event were defined directly in `CampaignBehavior.csx`, editing it while the campaign is running would still use the original handler.
+
+The mod comes with a stock `CampaignBehavior.csx` that already has the above snippet in it. Thus, to run some code on `DailyTick`, it's only necessary to create `CampaignEvents.csx` in the user or campaign script folder (as needed), and define method `void DailyTick()` inside. For other events, `CampaignBehavior.csx` has to be adjusted.
+
+**WARNING**: messing around with `CampaignBehavior.SyncData()` can easily render your saves unusable! It is intentionally undocumented; if you don't already know what it is for, and how to *safely* use `IDataStore`, it's best to leave it alone.
+
+## Editing scripts
+
+The mod automatically generates omnisharp.json in the user scripts folder, which enables Intellisense in [Visual Studio Code](https://code.visualstudio.com/) (or any other editor or IDE that uses [OmniSharp](http://www.omnisharp.net/)). To use it, simply do File ⇒ Open Folder in VSCode to open the folder, and then open individual .csx files from the Explorer pane.
+
+## Debugging scripts
+
+Scripts are compiled with full debug information. If Visual Studio is [attached](https://docs.microsoft.com/en-us/visualstudio/debugger/attach-to-running-processes-with-the-visual-studio-debugger) to the Bannerlord process, it is possible to set breakpoints, break on exceptions, and use all other debugging facilities. 
