@@ -42,61 +42,6 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             }
         });
 
-        [CommandLineFunctionality.CommandLineArgumentFunction("reset", "csx")]
-        public static string Reset(List<string> args) => WithErrorHandling(output => {
-            if (args.Count != 0) {
-                throw new CommandException("Usage: csx.reset");
-            }
-
-            evalState = CSharpScript.RunAsync("", Scripts.GetScriptOptions()).GetAwaiter().GetResult();
-            output.Write("Script state reset.");
-        });
-
-
-        [CommandLineFunctionality.CommandLineArgumentFunction("eval", "csx")]
-        public static string Eval(List<string> args) => WithErrorHandling(output => {
-            if (args.Count < 1) {
-                throw new CommandException("Usage: csx.eval {<expression> | <statement>.,}");
-            }
-
-            if (evalState == null) {
-                Reset(new());
-            }
-
-            var code = ToCode(args);
-            try {
-                ScriptGlobals.Prepare(output, null);
-                evalState = evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
-            } finally {
-                ScriptGlobals.Cleanup();
-            }
-            output.Write(evalState.ReturnValue);
-        });
-
-        [CommandLineFunctionality.CommandLineArgumentFunction("dump", "csx")]
-        public static string Dump(List<string> args) {
-            if (args.Count < 1) {
-                throw new CommandException("Usage: csx.dump <expression>");
-            }
-            return Eval(args.Prepend("Dump(").Append(")").ToList());
-        }
-
-        [CommandLineFunctionality.CommandLineArgumentFunction("edit", "csx")]
-        public static string Edit(List<string> args) {
-            if (args.Count < 1) {
-                throw new CommandException("Usage: csx.edit <expression>");
-            }
-            return Eval(args.Prepend("Edit(").Append(")").ToList());
-        }
-
-        [CommandLineFunctionality.CommandLineArgumentFunction("run", "csx")]
-        public static string Run(List<string> args) {
-            if (args.Count < 1) {
-                throw new CommandException("Usage: csx.run <script>[.<function>]([<args>...])");
-            }
-            return Eval(args.Prepend("Scripts.").ToList());
-        }
-
         [CommandLineFunctionality.CommandLineArgumentFunction("list", "csx")]
         public static string List(List<string> args) => WithErrorHandling(output => {
             if (args.Count != 0) {
@@ -118,6 +63,63 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 }
                 output.WriteLine();
             }
+        });
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("reset", "csx")]
+        public static string Reset(List<string> args) => WithErrorHandling(output => {
+            if (args.Count != 0) {
+                throw new CommandException("Usage: csx.reset");
+            }
+
+            evalState = CSharpScript.RunAsync("", Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+            output.Write("Script state reset.");
+        });
+
+        private static void Eval(IEnumerable<string> args, TextWriter output) {
+            if (evalState == null) {
+                Reset(new());
+            }
+
+            var code = ToCode(args);
+            try {
+                ScriptGlobals.Prepare(output, null);
+                evalState = evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+            } finally {
+                ScriptGlobals.Cleanup();
+            }
+            output.Write(evalState.ReturnValue);
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("eval", "csx")]
+        public static string Eval(List<string> args) => WithErrorHandling(output => {
+            if (args.Count < 1) {
+                throw new CommandException("Usage: csx.eval {<expression> | <statement>.,}");
+            }
+            Eval(args, output);
+        });
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("dump", "csx")]
+        public static string Dump(List<string> args) => WithErrorHandling(output => {
+            if (args.Count < 1) {
+                throw new CommandException("Usage: csx.dump <expression>");
+            }
+            Eval(args.Prepend("Dump(").Append(")"), output);
+        });
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("edit", "csx")]
+        public static string Edit(List<string> args) => WithErrorHandling(output => {
+            if (args.Count < 1) {
+                throw new CommandException("Usage: csx.edit <expression>");
+            }
+            Eval(args.Prepend("Edit(").Append(")"), output);
+        });
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("run", "csx")]
+        public static string Run(List<string> args) => WithErrorHandling(output => {
+            if (args.Count < 1) {
+                throw new CommandException("Usage: csx.run <script>[.<function>]([<args>...])");
+            }
+            Eval(args.Prepend("Scripts."), output);
         });
     }
 
