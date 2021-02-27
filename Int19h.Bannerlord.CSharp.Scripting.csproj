@@ -16,8 +16,8 @@
     <Product>C# Scripting for Mount &amp; Blade II: Bannerlord</Product>
     <Copyright>Copyright © 2020-2021 Pavel "int19h" Minaev</Copyright>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/int19h/csx/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/int19h/csx/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/int19h/Bannerlord.CSharp.Scripting</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/int19h/Bannerlord.CSharp.Scripting</RepositoryUrl>
     <Authors>Pavel Minaev</Authors>
     <Company />
   </PropertyGroup>
@@ -141,5 +141,6 @@
   <PropertyGroup>
     <PostBuildCopyToModulesRegex>.*\.csx|$(PostBuildCopyToModulesRegex)</PostBuildCopyToModulesRegex>
     <AssemblyName>Int19h.Bannerlord.CSharp.Scripting</AssemblyName>
+    <Description>https://github.com/int19h/Bannerlord.CSharp.Scripting</Description>
   </PropertyGroup>
 </Project>
