@@ -6,7 +6,7 @@
     <Platforms>x64</Platforms>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
-    <ModuleName>$(MSBuildProjectName)</ModuleName>
+    <ModuleName>CSharpScripting</ModuleName>
     <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
     <RootNamespace>Int19h.Bannerlord.CSharp.Scripting</RootNamespace>
   </PropertyGroup>
@@ -140,5 +140,6 @@
 
   <PropertyGroup>
     <PostBuildCopyToModulesRegex>.*\.csx|$(PostBuildCopyToModulesRegex)</PostBuildCopyToModulesRegex>
+    <AssemblyName>Int19h.Bannerlord.CSharp.Scripting</AssemblyName>
   </PropertyGroup>
 </Project>

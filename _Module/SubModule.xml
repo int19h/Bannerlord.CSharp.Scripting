@@ -11,7 +11,7 @@
 	<SubModules>
 		<SubModule>
 			<Name value="$modulename$" />
-			<DLLName value="$modulename$.dll" />
+			<DLLName value="Int19h.Bannerlord.CSharp.Scripting.dll" />
 			<SubModuleClassType value="Int19h.Bannerlord.CSharp.Scripting.SubModule"/>
 			<Tags>
 				<Tag key="DedicatedServerType" value="none" />
