@@ -23,7 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Config.Default.xml" />
     <None Remove="Scripts\*.*" />
     <None Include="LICENSE.md">
       <Pack>True</Pack>
@@ -32,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Config.Default.xml" />
     <EmbeddedResource Include="Scripts\*.*" />
   </ItemGroup>
 
