@@ -26,7 +26,7 @@ void ListMembers() {
 /// Lists all of the player clan's unmarried nobles of marriageable age.
 /// </summary>
 void ListUnmarried() {
-    foreach (var hero in MyClan.Lords) {
+    foreach (var hero in MyClan.Lords.OrderBy(h => $"{h.Name}")) {
         if (!hero.IsAlive || hero.Age < 18 || hero.Spouse != null) {
             continue;
         }

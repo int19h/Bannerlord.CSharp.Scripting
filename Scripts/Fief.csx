@@ -20,14 +20,14 @@ void SetFoodStocks(Town[] fiefs, int value = int.MaxValue) {
     }
 }
 
-void AddFoodToMarkets(Town[] fiefs, int extraFood = 1000) {
+void AddFoodToMarket(Town[] fiefs, int extraFood = 1000) {
     var foods = ItemObject.All.Where(item => item.IsFood).ToArray();
     foreach (var fief in fiefs) {
         if (!fief.IsTown) {
             continue;
         }
 
-        Log.WriteLine($"{fief} item roster:");
+        Log.WriteLine($"{fief}:");
         var roster = fief.Settlement.ItemRoster;
 
         foreach (var food in foods) {
@@ -80,6 +80,7 @@ void PrioritizeFood(Town[] fiefs) {
             if (!building.IsCurrentlyDefault && building.BuildingType == DefaultBuildingTypes.IrrigationDaily) {
                 Log.WriteLine($"{fief} -> {building.BuildingType}");
                 Helpers.BuildingHelper.ChangeDefaultBuilding(building, fief);
+                break;
             }
         }
     }
@@ -88,7 +89,7 @@ void PrioritizeFood(Town[] fiefs) {
 void Rebel(Town[] fiefs) {
     var rcb = Campaign.Current.CampaignBehaviorManager.GetBehavior<RebellionsCampaignBehavior>();
     foreach (var fief in fiefs) {
-        Log.Write(fief);
+        Log.WriteLine(fief);
         rcb.GetType().InvokeMember(
             "StartRebellionEvent",
             BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic,

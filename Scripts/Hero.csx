@@ -1,4 +1,24 @@
-﻿void GiveAllPerks(Hero[] heroes) {
+﻿void Kill(Hero[] heroes) {
+    foreach (var hero in heroes) {
+        if (hero.IsAlive) {
+            Log.WriteLine(hero);
+            KillCharacterAction.ApplyByMurder(hero);
+        }
+    }
+}
+
+void MakePregnant(Hero[] heroes) {
+    foreach (var hero in heroes) {
+        if (hero.IsAlive && hero.IsFemale && !hero.IsPregnant &&
+            hero.Spouse != null && hero.Age >= 18 && hero.Age <= 45
+        ) {
+            Log.WriteLine(hero);
+            MakePregnantAction.Apply(hero);
+        }
+    }
+}
+
+void GiveAllPerks(Hero[] heroes) {
     foreach (var hero in heroes.Distinct()) {
         Log.WriteLine(hero);
 
@@ -123,29 +143,3 @@ void SetSkills(Hero[] heroes, int all) => SetSkills(
     all, all, all,
     all, all, all
 );    
-
-void MakePregnant(Hero[] heroes) {
-    foreach (var hero in heroes) {
-        if (hero.IsAlive && hero.IsFemale && !hero.IsPregnant &&
-            hero.Spouse != null && hero.Age >= 18 && hero.Age <= 45
-        ) {
-            Log.WriteLine(hero);
-            MakePregnantAction.Apply(hero);
-        }
-    }
-}
-
-void KillOtherNobles() {
-    var nobles = (
-        from clan in Campaign.Current.Clans
-        where clan != Clan.PlayerClan && (clan.Kingdom != null || clan.IsClanTypeMercenary)
-        from hero in clan.Heroes
-        where hero.IsAlive
-        select hero
-    ).ToArray(); // snapshot
-
-    foreach (var hero in nobles) {
-        Log.WriteLine(hero);
-        hero.Kill();
-    }
-}

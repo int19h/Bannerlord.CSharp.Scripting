@@ -1,6 +1,6 @@
 ﻿void SetHearths(Village[] villages, int hearths = 1000) {
     foreach (var village in villages) {
-        Log.WriteLine($"{village}: {village.Hearth} -> {Hearth}");
+        Log.WriteLine($"{village}: {village.Hearth} -> {hearths}");
         village.Hearth = hearths;
     }
 }
