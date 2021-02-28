@@ -216,9 +216,9 @@ The last one is a static class that serves as a mod-specific scripting API - its
 
 ### Producing output
 
-Bannerlord console does not provide facilities for commands to produce output as they are running; only when they complete. For more complicated scripts, this can be fairly limited, so the mod provides an incremental logging facility that buffers output, and prints it to console when the script finishes running (even if it throws an exception). This is exposed as global variable `Log`, which is an object derived from `TextWriter` - thus, it can be used much like `Console` in console C# apps.
+Bannerlord console does not provide facilities for commands to produce output as they are running; only when they complete. For more complicated scripts, this can be fairly limited, so the mod provides an incremental logging facility that buffers output, and prints it to console when the script finishes running (even if it throws an exception). This is exposed as global variable `Log` of type `TextWriter` - thus, it can be used much like `Console` in console C# apps.
 
-In addition to console output, `Log` can also write output to files. This is disabled by default, and scripts have to opt into it by calling `Log.ToFile()`. The argument, if specified, is the name of the file to write to; if not specified, the log is written to the file with the same name as the script file, but with extension .log rather than .csx. 
+In addition to console output, `Log` can also write output to files. This is disabled by default, and can be enabled from the console by doing `csx.log_to …`, passing the filename as the argument. To stop logging to file, use `csx.log_to -`. 
 
 ### Locating game objects
 

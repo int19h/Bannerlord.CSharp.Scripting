@@ -11,21 +11,23 @@ using TaleWorlds.Library;
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public static class Commands {
         private static ScriptState? evalState = null;
+        private static TextWriter? loggingTo = null;
 
         private static string WithErrorHandling(Action<TextWriter> body) {
-            var output = new System.IO.StringWriter();
-            try {
-                body(output);
-            } catch (CommandException ex) {
-                output.WriteLine(ex.Message);
-            } catch (CompilationErrorException ex) {
-                foreach (var diag in ex.Diagnostics) {
-                    output.WriteLine(diag);
+            using (var output = new System.IO.StringWriter()) {
+                try {
+                    body(output);
+                } catch (CommandException ex) {
+                    output.WriteLine(ex.Message);
+                } catch (CompilationErrorException ex) {
+                    foreach (var diag in ex.Diagnostics) {
+                        output.WriteLine(diag);
+                    }
+                } catch (Exception ex) {
+                    output.WriteLine(ex);
                 }
-            } catch (Exception ex) {
-                output.WriteLine(ex);
+                return output.ToString();
             }
-            return output.ToString();
         }
 
         private static string ToCode(IEnumerable<string> args) =>
@@ -75,17 +77,33 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             output.Write("Script state reset.");
         });
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("log_to", "csx")]
+        public static string LogTo(List<string> args) => WithErrorHandling(output => {
+            if (args.Count != 1) {
+                throw new CommandException("Usage: csx.log_to {<filename> | -}");
+            }
+
+            if (loggingTo is not null) {
+                ScriptGlobals.Log.RemoveWriter(loggingTo);
+                loggingTo.Dispose();
+                loggingTo = null;
+            }
+
+            var fileName = args[0];
+            if (fileName != "-") {
+                loggingTo = File.CreateText(fileName);
+                ScriptGlobals.Log.AddWriter(loggingTo);
+            }
+        });
+
         private static void Eval(IEnumerable<string> args, TextWriter output) {
             if (evalState == null) {
                 Reset(new());
             }
 
             var code = ToCode(args);
-            try {
-                ScriptGlobals.Prepare(output, null);
+            using (ScriptGlobals.Log.WithWriter(output)) {
                 evalState = evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
-            } finally {
-                ScriptGlobals.Cleanup();
             }
             output.Write(evalState.ReturnValue);
         }
