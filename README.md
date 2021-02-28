@@ -10,7 +10,9 @@ There are no known compatibility issues with other Bannerlord mods.
 
 ## Installation
 
-Download the most recent version from [Releases](https://github.com/int19h/Bannerlord.CSharp.Scripting/releases), and unpack it to the Modules folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
+**WARNING**: if you had csx 0.1.0 or 0.2.0 installed, please remove it first by deleting the `csx` folder in your Bannerlord `Modules` folder.
+
+Download the most recent version from [Releases](https://github.com/int19h/Bannerlord.CSharp.Scripting/releases), and unpack it to the `Modules` folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
 
 If the mod has been loaded correctly, you should see "C# Scripting" when you click Mods in the launcher.
 
