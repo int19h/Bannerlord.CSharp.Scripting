@@ -239,7 +239,7 @@ To make the scripts more concise and facilitate `csx.eval` one-liners, the mod p
 
 In addition to those, there are several *lookup tables*. A lookup table wraps some enumerable of game objects. When enumerated, it behaves the same as the original enumerable. However, it also provides indexers that can be used to look up objects by their display name:
 ```cs
-Heroes["Rhaega"]
+Heroes["Rhagaea"]
 ```
 or by their `StringId`:
 ```cs
@@ -292,12 +292,12 @@ void Kill(Hero hero) {
 ```
 can be invoked as:
 ```
-# csx.run Kill('Rhaega')
+# csx.run Kill('Rhagaea')
 # csx.run Kill(Id('main_hero'))
 ```
 which has the same effect as:
 ```
-# csx.run Kill(Heroes['Rhaega'])
+# csx.run Kill(Heroes['Rhagaea'])
 # csx.run Kill(Heroes[Id('main_hero')])
 ```
 
@@ -312,22 +312,22 @@ void Kill(Hero[] heroes) {
 ```
 can *also* be invoked as:
 ```
-# csx.run Kill('Rhaega')
+# csx.run Kill('Rhagaea')
 # csx.run Kill(Id('main_hero'))
 ```
 which in this case is equivalent to:
 ```
-# csx.run Kill(new[] { Heroes['Rhaega'] })
+# csx.run Kill(new[] { Heroes['Rhagaea'] })
 # csx.run Kill(new[] { Heroes[Id('main_hero')] })
 ```
 
 Furthermore, for array arguments, it's possible to pass tuples of values, mixing strings, IDs, and enumerables together - these are all concatenated into a single array of the corresponding type, looking objects up by name or ID as needed. For example (note the extra parentheses around the tuple):
 ```
-# csx.run Kill(('Rhaega', Id('main_hero'), MyKingdom.Ruler, MyCompanions))
+# csx.run Kill(('Rhagaea', Id('main_hero'), MyKingdom.Ruler, MyCompanions))
 ```
 is equivalent to:
 ```
-# csx.run Kill(new[] { Heroes['Rhaega'] }.Append(Heroes[Id('main_hero')]).Append(MyKingdom.Ruler).Concat(MyCompanions).ToArray())
+# csx.run Kill(new[] { Heroes['Rhagaea'] }.Append(Heroes[Id('main_hero')]).Append(MyKingdom.Ruler).Concat(MyCompanions).ToArray())
 ```
 
 Global variable `All` has an unspecified type that is implicitly convertible to arrays of all of the above types, making it possible to write:
