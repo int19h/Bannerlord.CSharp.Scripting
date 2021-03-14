@@ -59,6 +59,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                     writer.WriteLine($"/u:{ns}");
                 }
                 writer.WriteLine($"/u:{typeof(ScriptGlobals).FullName}");
+                writer.WriteLine();
+
+                writer.WriteLine($"/loadpath:\"{UserLocation}\"");
+                writer.WriteLine($"/loadpath:\"{SharedLocation}\"");
             }
         }
 
