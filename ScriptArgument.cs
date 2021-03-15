@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public class ScriptArgument {
@@ -229,7 +230,47 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         }
     }
 
-    internal class UnrestrictedScriptArgument : ScriptArgument<Kingdom, Clan, Hero, Town, Village, MobileParty> {
+    public class ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8> : ScriptArgument<T1, T2, T3, T4, T5, T6, T7> {
+        internal ScriptArgument(object?[] values) : base(values) { }
+
+        public static implicit operator T8?[](ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8> arg) => arg.LookUp<T8>();
+
+        internal new dynamic RestrictBy(string s) => this;
+
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T8 item) => new ScriptArgument<T8>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2, T3, T4, T5, T6, T7>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T8?(ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8>.Scalar arg) => LookUp<T8>(arg.Value);
+
+            public static implicit operator T8?[](ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8>.Scalar arg) => arg.LookUp<T8>();
+        }
+    }
+
+    public class ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9> : ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8> {
+        internal ScriptArgument(object?[] values) : base(values) { }
+
+        public static implicit operator T9?[](ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9> arg) => arg.LookUp<T9>();
+
+        internal new dynamic RestrictBy(string s) => this;
+
+        internal new dynamic RestrictBy(Lookup lookup) => this;
+
+        internal dynamic RestrictBy(T9 item) => new ScriptArgument<T9>(Values);
+
+        public new class Scalar : ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8>.Scalar {
+            public Scalar(object value) : base(value) { }
+
+            public static implicit operator T9?(ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Scalar arg) => LookUp<T9>(arg.Value);
+
+            public static implicit operator T9?[](ScriptArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Scalar arg) => arg.LookUp<T9>();
+        }
+    }
+
+    internal class UnrestrictedScriptArgument : ScriptArgument<Kingdom, Clan, Hero, Settlement, Town, Village, MobileParty, ItemObject> {
         internal UnrestrictedScriptArgument(object?[] values) : base(values) { }
 
         private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty>(Values);
@@ -242,10 +283,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         internal dynamic RestrictBy<T>(T value) => new ScriptArgument<T>(Values);
 
-        public new class Scalar : ScriptArgument<Kingdom, Clan, Hero, Town, Village, MobileParty>.Scalar {
+        public new class Scalar : ScriptArgument<Kingdom, Clan, Hero, Settlement, Town, Village, MobileParty, ItemObject>.Scalar {
             public Scalar(object value) : base(value) { }
 
-            private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty>.Scalar(Value);
+            private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Settlement, Town, Village, MobileParty, ItemObject>.Scalar(Value);
 
             internal new dynamic RestrictBy(string s) => Unrestricted<string>();
 

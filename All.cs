@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public struct All {
@@ -16,5 +17,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         public static implicit operator Village[](All all) => ScriptGlobals.Villages.ToArray();
 
         public static implicit operator MobileParty[](All all) => ScriptGlobals.Parties.ToArray();
+
+        public static implicit operator ItemObject[](All all) => ScriptGlobals.Items.ToArray();
     }
 }

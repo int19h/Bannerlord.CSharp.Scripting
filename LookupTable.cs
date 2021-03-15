@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public interface ILookupTable<out T> : IReadOnlyCollection<T> {
@@ -73,10 +74,12 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             Getter<Kingdom>.Get = () => ScriptGlobals.Kingdoms;
             Getter<Clan>.Get = () => ScriptGlobals.Clans;
             Getter<Hero>.Get = () => ScriptGlobals.Heroes;
+            Getter<Settlement>.Get = () => ScriptGlobals.Settlements;
             Getter<Fief>.Get = () => ScriptGlobals.Fiefs;
             Getter<Town>.Get = () => ScriptGlobals.Fiefs;
             Getter<Village>.Get = () => ScriptGlobals.Villages;
             Getter<MobileParty>.Get = () => ScriptGlobals.Parties;
+            Getter<ItemObject>.Get = () => ScriptGlobals.Items;
         }
 
         private static LookupTables Instance;

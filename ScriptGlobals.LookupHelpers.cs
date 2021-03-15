@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     partial class ScriptGlobals {
@@ -28,6 +29,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         public static ILookupTable<Village> Villages => Village.All.ToLookupTable();
 
         public static ILookupTable<MobileParty> Parties => MobileParty.All.ToLookupTable();
+
+        public static ILookupTable<ItemObject> Items => ItemObject.All.ToLookupTable();
 
         public static ILookupTable<Hero> Descendants(this Hero hero) {
             IEnumerable<Hero> GetDescendants(Hero hero) {
