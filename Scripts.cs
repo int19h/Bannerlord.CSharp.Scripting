@@ -43,8 +43,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                     }
                     writer.WriteLine($"/r:\"{asm.Location}\"");
                     foreach (var type in asm.GetExportedTypes()) {
-                        if (type.Namespace != null && type.Namespace.StartsWith("TaleWorlds")) {
-                            nss.Add(type.Namespace);
+                        var ns = type.Namespace;
+                        if (ns != null && (ns.StartsWith("TaleWorlds") || ns.StartsWith("SandBox"))) {
+                            nss.Add(ns);
                         }
                     }
                 }
@@ -61,8 +62,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 writer.WriteLine($"/u:{typeof(ScriptGlobals).FullName}");
                 writer.WriteLine();
 
-                writer.WriteLine($"/loadpath:\"{UserLocation}\"");
-                writer.WriteLine($"/loadpath:\"{SharedLocation}\"");
+                foreach (var loadPath in GetSearchPaths()) {
+                    writer.WriteLine($"/loadpath:\"{loadPath}\"");
+                }
             }
         }
 
