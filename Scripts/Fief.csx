@@ -1,4 +1,6 @@
-﻿void BuildAll(Town[] fiefs) {
+﻿IEnumerable<ItemObject> Items() => Game.Current.ObjectManager.GetObjectTypeList<ItemObject>();
+
+void BuildAll(Town[] fiefs) {
     foreach (var fief in fiefs) {
         Log.WriteLine(fief);
         fief.BuildingsInProgress.Clear();
@@ -21,7 +23,7 @@ void SetFoodStocks(Town[] fiefs, int value = int.MaxValue) {
 }
 
 void AddFoodToMarket(Town[] fiefs, int extraFood = 1000) {
-    var foods = ItemObject.All.Where(item => item.IsFood).ToArray();
+    var foods = Items().Where(item => item.IsFood).ToArray();
     foreach (var fief in fiefs) {
         if (!fief.IsTown) {
             continue;
@@ -90,15 +92,6 @@ void Rebel(Town[] fiefs) {
     var rcb = Campaign.Current.CampaignBehaviorManager.GetBehavior<RebellionsCampaignBehavior>();
     foreach (var fief in fiefs) {
         Log.WriteLine(fief);
-        rcb.GetType().InvokeMember(
-            "StartRebellionEvent",
-            BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic,
-            null,
-            rcb,
-            new object[] { fief.Settlement },
-            new ParameterModifier[0],
-            null,
-            null
-        );
+        IgnoreVisibility(() => rcb.StartRebellionEvent(fief.Settlement));
     }
 }

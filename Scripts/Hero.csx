@@ -22,10 +22,10 @@ void GiveAllPerks(Hero[] heroes) {
     foreach (var hero in heroes.Distinct()) {
         Log.WriteLine(hero);
 
-        foreach (var perk in DefaultPerks.GetAllPerks()) {
+        foreach (var perk in Perks) {
             if (!hero.GetPerkValue(perk)) {
                 Log.WriteLine($"  + {perk}");
-                hero.SetPerkValue(perk, true);
+                IgnoreVisibility(() => hero.SetPerkValueInternal(perk, true));
             }
         }
     }
@@ -43,20 +43,20 @@ void SetAttributes(
     foreach (var hero in heroes.Distinct()) {
         Log.WriteLine(hero);
 
-        void SetAttribute(CharacterAttributesEnum attr, int? value) {
+        void SetAttribute(CharacterAttribute attr, int? value) {
             var oldValue = hero.GetAttributeValue(attr);
             if (value is int newValue && newValue != oldValue) {
-                Log.WriteLine($"  {attr}: {oldValue} -> {newValue}");
-                hero.SetAttributeValue(attr, newValue);
+                Log.WriteLine($"  {attr.Name}: {oldValue} -> {newValue}");
+                IgnoreVisibility(() => hero.SetAttributeValueInternal(attr, newValue));
             }
         }
 
-        SetAttribute(CharacterAttributesEnum.Vigor, vigor);
-        SetAttribute(CharacterAttributesEnum.Endurance, endurance);
-        SetAttribute(CharacterAttributesEnum.Control, control);
-        SetAttribute(CharacterAttributesEnum.Cunning, cunning);
-        SetAttribute(CharacterAttributesEnum.Social, social);
-        SetAttribute(CharacterAttributesEnum.Intelligence, intelligence);
+        SetAttribute(DefaultCharacterAttributes.Vigor, vigor);
+        SetAttribute(DefaultCharacterAttributes.Endurance, endurance);
+        SetAttribute(DefaultCharacterAttributes.Control, control);
+        SetAttribute(DefaultCharacterAttributes.Cunning, cunning);
+        SetAttribute(DefaultCharacterAttributes.Social, social);
+        SetAttribute(DefaultCharacterAttributes.Intelligence, intelligence);
     }
 }
 
@@ -104,7 +104,7 @@ void SetSkills(
             if (value is int newValue && newValue != oldValue) {
                 newValue = Math.Min(newValue, 1023);
                 Log.WriteLine($"  {skill}: {oldValue} -> {newValue}");
-                hero.SetSkillValue(skill, newValue);
+                IgnoreVisibility(() => hero.SetSkillValueInternal(skill, newValue));
             }
         }
 
@@ -143,3 +143,119 @@ void SetSkills(Hero[] heroes, int all) => SetSkills(
     all, all, all,
     all, all, all
 );    
+
+void AddFocus(
+    Hero[] heroes,
+    int? oneHanded = null, int? twoHanded = null, int? polearm = null,
+    int? bow = null, int? crossbow = null, int? throwing = null,
+    int? riding = null, int? athletics = null, int? smithing = null,
+    int? scouting = null, int? tactics = null, int? roguery = null,
+    int? charm = null, int? leadership = null, int? trade = null,
+    int? steward = null, int? medicine = null, int? engineering = null
+) {
+    foreach (var hero in heroes.Distinct()) {
+        Log.WriteLine(hero);
+
+        void AddFocus(SkillObject skill, int? value) {
+            if (value is null) {
+                return;
+            }
+            var oldValue = hero.HeroDeveloper.GetFocus(skill);
+            var newValue = Math.Min(oldValue + value.Value, 5);
+            if (oldValue != newValue) {
+                Log.WriteLine($"  {skill}: {oldValue} -> {newValue}");
+                hero.HeroDeveloper.AddFocus(skill, newValue - oldValue, checkUnspentFocusPoints: false);
+            }
+        }
+
+        AddFocus(DefaultSkills.OneHanded, oneHanded);
+        AddFocus(DefaultSkills.TwoHanded, twoHanded);
+        AddFocus(DefaultSkills.Polearm, polearm);
+
+        AddFocus(DefaultSkills.Bow, bow);
+        AddFocus(DefaultSkills.Crossbow, crossbow);
+        AddFocus(DefaultSkills.Throwing, throwing);
+
+        AddFocus(DefaultSkills.Riding, riding);
+        AddFocus(DefaultSkills.Athletics, athletics);
+        AddFocus(DefaultSkills.Crafting, smithing);
+
+        AddFocus(DefaultSkills.Scouting, scouting);
+        AddFocus(DefaultSkills.Tactics, tactics);
+        AddFocus(DefaultSkills.Roguery, roguery);
+
+        AddFocus(DefaultSkills.Charm, charm);
+        AddFocus(DefaultSkills.Leadership, leadership);
+        AddFocus(DefaultSkills.Trade, trade);
+
+        AddFocus(DefaultSkills.Steward, steward);
+        AddFocus(DefaultSkills.Medicine, medicine);
+        AddFocus(DefaultSkills.Engineering, engineering);
+    }
+}
+
+void AddFocus(Hero[] heroes, int all) => AddFocus(
+    heroes,
+    all, all, all,
+    all, all, all,
+    all, all, all,
+    all, all, all,
+    all, all, all,
+    all, all, all
+);    
+
+void SetTraits(
+    Hero[] heroes,
+    int? mercy = null,
+    int? valor = null,
+    int? honor = null,
+    int? generosity = null,
+    int? calculating = null
+) {
+    foreach (var hero in heroes.Distinct()) {
+        Log.WriteLine(hero);
+
+        void SetTrait(TraitObject trait, int? value) {
+            var oldValue = hero.GetTraitLevel(trait);
+            if (value is int newValue && newValue != oldValue) {
+                newValue = Math.Max(Math.Min(newValue, 2), -2);
+                Log.WriteLine($"  {trait.Name}: {oldValue} -> {newValue}");
+                hero.SetTraitLevelInternal(trait, newValue);
+            }
+        }
+
+        SetTrait(DefaultTraits.Mercy, mercy);
+        SetTrait(DefaultTraits.Valor, valor);
+        SetTrait(DefaultTraits.Honor, honor);
+        SetTrait(DefaultTraits.Generosity, generosity);
+        SetTrait(DefaultTraits.Calculating, calculating);
+    }
+}
+
+void SetTraits(Hero[] heroes, int all) => SetTraits(heroes, all, all, all, all, all);
+
+void AddPower(Hero[] heroes, float power) {
+    foreach (var hero in heroes) {
+        var oldPower = hero.Power;
+        hero.AddPower(power);
+        Log.WriteLine($"{hero}: {oldPower} -> {hero.Power}");
+    }
+}
+
+void Educate(Hero[] heroes) {
+    var ecb = Campaign.Current.CampaignBehaviorManager.GetBehavior<EducationCampaignBehavior>();
+    foreach (var hero in heroes) {
+        if (!hero.IsChild) {
+            continue;
+        }
+        Log.WriteLine(hero);
+        IgnoreVisibility(() => ecb.OnHeroComesOfAge(hero));
+    }
+    SandBox.View.Map.MapScreen.Instance.MapNotificationView.ResetNotifications();
+}
+
+void SetAge(Hero[] heroes, int age) {
+    foreach (var hero in heroes) {
+        hero.SetBirthDay(Helpers.HeroHelper.GetRandomBirthDayForAge(age));
+    }
+}

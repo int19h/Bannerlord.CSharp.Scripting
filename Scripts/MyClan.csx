@@ -40,7 +40,7 @@ void ListUnmarried() {
             }
 
             foreach (var other in clan.Lords.OrderByDescending(h => h.Age)) {
-                if (Romance.MarriageCourtshipPossibility(hero, other)) {
+                if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(hero, other)) {
                     candidates.Add(other);
                     break;
                 }
@@ -121,6 +121,23 @@ void ListUpgradeableFiefs() {
                 }
                 Log.WriteLine($"  {building.Name} - {building.CurrentLevel}");
             }
+        }
+    }
+}
+
+/// <summary>
+/// Displays the contents of non-empty stashes in all your fiefs.
+/// </summary>
+void ShowStashes() {
+    foreach (var fief in MyClan.Fiefs.OrderBy(it => $"{it}")) {
+        var stash = fief.Settlement.Stash;
+        if (stash.Count == 0) {
+            continue;
+        }
+
+        Log.WriteLine($"{fief}:");
+        foreach (var item in stash.OrderBy(it => $"{it.EquipmentElement.Item.Name}")) {
+            Log.WriteLine($"  {item.EquipmentElement.Item.Name} - {item.Amount}");
         }
     }
 }

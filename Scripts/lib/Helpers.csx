@@ -10,7 +10,7 @@ static void WriteHero(this TextWriter writer, Hero hero, bool withAsc = true, bo
     if (withAsc) {
         writer.Write($" ({hero.Age:N0}/");
         writer.Write(hero.IsFemale ? "F" : "M");
-        if (hero.IsFemale && hero.IsFertile && hero.Age >= 18 && hero.Age <= 45) {
+        if (hero.IsFemale && hero.Age >= 18 && hero.Age <= 45) {
             writer.Write("+");
         }
         writer.Write($"/{hero.Culture})");

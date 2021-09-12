@@ -13,3 +13,17 @@ void DestroyAllBandits() {
         select party;
     Destroy(banditParties.ToArray());
 }
+
+void GiveFood(MobileParty[] parties, int amount) {
+    var foodIds = new[] { "grain", "fish", "grape", "olives", "butter", "meat", "date_fruit", "cheese", "beer", "wine", "oil" };
+    var foods = from id in foodIds select ItemObjects.Single(it => it.StringId == id);
+    foreach (var party in parties) {
+        Log.WriteLine($"{party}");
+        foreach (var food in foods) {
+            var oldValue = party.ItemRoster.GetItemNumber(food);
+            party.ItemRoster.AddToCounts(food, amount);
+            var newValue = party.ItemRoster.GetItemNumber(food);
+            Log.WriteLine($"  {food}: {oldValue} -> {newValue}");
+        }
+    }
+}
