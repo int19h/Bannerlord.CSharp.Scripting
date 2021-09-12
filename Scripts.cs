@@ -87,8 +87,8 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         }
 
         internal static IEnumerable<string> GetSearchPaths() {
-            if (Campaign.Current != null) {
-                yield return Path.Combine(UserLocation, "Campaigns", Campaign.Current.UniqueGameId);
+            if (Campaign.Current?.UniqueGameId is string gameId) {
+                yield return Path.Combine(UserLocation, "Campaigns", gameId);
             }
             yield return UserLocation;
             yield return SharedLocation;
