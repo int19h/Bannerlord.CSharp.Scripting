@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using TaleWorlds.Library;
@@ -73,7 +76,9 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 throw new CommandException("Usage: csx.reset");
             }
 
-            evalState = CSharpScript.RunAsync("", Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+            var script = CSharpScript.Create("", Scripts.GetScriptOptions());
+            Scripts.IgnoreVisibility(script);
+            evalState = script.RunAsync().GetAwaiter().GetResult();
             output.Write("Script state reset.");
         });
 
@@ -99,11 +104,16 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
         private static void Eval(IEnumerable<string> args, TextWriter output) {
             if (evalState == null) {
                 Reset(new());
+                if (evalState == null) {
+                    throw new NullReferenceException();
+                }
             }
 
             var code = ToCode(args);
             using (ScriptGlobals.Log.WithWriter(output)) {
-                evalState = evalState!.ContinueWithAsync(code, Scripts.GetScriptOptions()).GetAwaiter().GetResult();
+                var script = evalState.Script.ContinueWith(code);
+                Scripts.IgnoreVisibility(script);
+                evalState = script.RunFromAsync(evalState).GetAwaiter().GetResult();
             }
             output.Write(evalState.ReturnValue);
         }
