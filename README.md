@@ -4,7 +4,7 @@ This mod for [M&B2: Bannerlord](https://www.taleworlds.com/en/Games/Bannerlord) 
 
 ## Prerequisites
 
-The mod is tested with Bannerlord e1.5.7 and e1.5.8 beta. Older versions of the game *may* work, but are considered unsupported.
+The mod is tested with Bannerlord e1.6.1 and e1.6.2 beta. Older versions of the game *may* work, but are considered unsupported.
 
 There are no known compatibility issues with other Bannerlord mods. 
 
@@ -203,6 +203,23 @@ void Test() {
 ```
 Note that this object is shared by *all* scripts, and is also accessible via `csx.eval`. 
 
+### Accessing non-public members
+
+Both `csx.eval` expressions and scripts are compiled with visibility checks disabled; thus, internal, protected, and private members can be accessed as well as public ones. Since CLR performs additional visibility checks at runtime, any expression that needs to ignore visibility needs to be wrapped with `IgnoreVisibility()` to disable those runtime checks. For example:
+
+```cs
+var rcb = Campaign.Current.CampaignBehaviorManager.GetBehavior<RebellionsCampaignBehavior>();
+IgnoreVisibility(() => rcb.StartRebellionEvent(settlement));
+```
+
+`StartRebellionEvent` is a private member of RebellionsCampaignBehavior; thus, `IgnoreVisibility` is required here. 
+
+The lambda passed to `IgnoreVisibility` is an expression tree, and all [limitations](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/conversions#anonymous-function-conversions) apply. In particular, the lambda cannot perform assignments. To allow private fields to be changed within the lambda, one has to use the `Set()` method instead:
+
+```cs
+IgnoreVisibility(() => Set(out ConversationManager._persuasion, new Persuasion(...)));
+```
+
 ### Execution environment
 
 Both `csx.eval` and scripts are executed in a pre-populated environment. It includes assembly references for all assemblies loaded in the Bannerlord process, and implicit `using` statements for all available namespaces that begin with `TaleWorlds`, as well as the following:
@@ -255,15 +272,20 @@ The following lookup tables are provided:
 
 - `Kingdoms` for `Kingdom.All`
 - `Clans` for `Clan.All`
-- `Heroes` for `Hero.All`
+- `Heroes` for `Hero.FindAll(_ => true)`
 - `Nobles` for `Heroes[hero => hero.IsNoble]`
 - `Wanderers` for `Heroes[hero => hero.IsWanderer]`
-- `Settlements` for `Settlement.All`
+- `Settlements` for `ObjectManager.GetObjectTypeList<Settlement>()`
 - `Fiefs` for `Town.AllFiefs`
 - `Towns` for `Town.AllTowns`
 - `Castles` for `Town.AllCastles`
 - `Villages` for `Village.All`
 - `Parties` for `MobileParty.All`
+- `ItemObjects` for `ObjectManager.GetObjectTypeList<ItemObject>()`
+- `Perks` for `ObjectManager.GetObjectTypeList<PerkObject>()`
+- `CharacterAttributes` for `ObjectManager.GetObjectTypeList<CharacterAttribute>()`
+- `Traits` for `ObjectManager.GetObjectTypeList<TraitObject>()`
+- `Skills` for `ObjectManager.GetObjectTypeList<SkillObject>()`
 - `MyFiefs` for `MyClan.Fiefs`
 - `MyTowns` for `MyFiefs[fief => fief.IsTown]`
 - `MyCastles` for `MyFiefs[fief => fief.IsCastle]`
@@ -279,9 +301,11 @@ In addition to the usual C# implicit conversions, the mod also provides implicit
 - `Kingdom`
 - `Clan`
 - `Hero`
+- `Settlement`
 - `Town`
 - `Village`
 - `MobileParty`
+- `ItemObject`
 
 When invoking a script with arguments of those types, instead of passing an object, a string or `Id()` can be used; the object is then automatically looked up in the corresponding lookup table. For example:
 ```cs
@@ -356,10 +380,35 @@ The mod comes with a stock `CampaignBehavior.csx` that already has the above sni
 
 **WARNING**: messing around with `CampaignBehavior.SyncData()` can easily render your saves unusable! It is intentionally undocumented; if you don't already know what it is for, and how to *safely* use `IDataStore`, it's best to leave it alone.
 
+### `SubModule`
+
+If there's a script named `SubModule`, it may define a method called `OnGameStart`:
+
+```cs
+void OnGameStart(Game game, IGameStarter gameStarterObject) => ...
+```
+
+If present, it will be invoked from the corresponding method of the C# Scripting module. This allows registering custom campaign behaviors, e.g.:
+
+```cs
+// SubModule.csx
+
+class ClanTierModel : DefaultClanTierModel {
+    public override int GetCompanionLimit(Clan clan) => 1000;
+
+    public override int GetPartyLimitForTier(Clan clan, int clanTierToCheck) => 100;
+}
+
+void OnGameStart(Game game, IGameStarter gameStarterObject) {
+    gameStarterObject.AddModel(new ClanTierModel());
+}
+```
+
 ## Editing scripts
 
 The mod automatically generates omnisharp.json in the user scripts folder, which enables Intellisense in [Visual Studio Code](https://code.visualstudio.com/) (or any other editor or IDE that uses [OmniSharp](http://www.omnisharp.net/)). To use it, simply do File ⇒ Open Folder in VSCode to open the folder, and then open individual .csx files from the Explorer pane.
 
+Note that OmniSharp is not aware of custom visibility settings for scripts. Thus, accessing non-public members will cause error squiggles while editing, even though the code will execute correctly at runtime.
 ## Debugging scripts
 
 Scripts are compiled with full debug information. If Visual Studio is [attached](https://docs.microsoft.com/en-us/visualstudio/debugger/attach-to-running-processes-with-the-visual-studio-debugger) to the Bannerlord process, it is possible to set breakpoints, break on exceptions, and use all other debugging facilities. 
