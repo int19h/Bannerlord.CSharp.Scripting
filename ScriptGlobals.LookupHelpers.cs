@@ -8,11 +8,11 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static IdLookup Id(string id) => new IdLookup(id);
 
-        public static ILookupTable<Kingdom> Kingdoms => Game.Current.ObjectManager.GetObjectTypeList<Kingdom>().ToLookupTable();
+        public static ILookupTable<Kingdom> Kingdoms => Kingdom.All.ToLookupTable();
 
-        public static ILookupTable<Clan> Clans => Game.Current.ObjectManager.GetObjectTypeList<Clan>().ToLookupTable();
+        public static ILookupTable<Clan> Clans => Clan.All.ToLookupTable();
 
-        public static ILookupTable<Hero> Heroes => Game.Current.ObjectManager.GetObjectTypeList<Hero>().ToLookupTable();
+        public static ILookupTable<Hero> Heroes => Hero.FindAll(_ => true).ToLookupTable();
 
         public static ILookupTable<Hero> Nobles => Heroes[hero => hero.IsNoble];
 
@@ -28,17 +28,17 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
 
         public static ILookupTable<Village> Villages => Village.All.ToLookupTable();
 
-        public static ILookupTable<MobileParty> Parties => Game.Current.ObjectManager.GetObjectTypeList<MobileParty>().ToLookupTable();
+        public static ILookupTable<MobileParty> Parties => MobileParty.All.ToLookupTable();
 
-        public static ILookupTable<ItemObject> Items => Game.Current.ObjectManager.GetObjectTypeList<ItemObject>().ToLookupTable();
+        public static ILookupTable<ItemObject> ItemObjects => Game.Current.ObjectManager.GetObjectTypeList<ItemObject>().ToLookupTable();
 
-        public static IEnumerable<PerkObject> Perks => Game.Current.ObjectManager.GetObjectTypeList<PerkObject>().ToLookupTable();
+        public static ILookupTable<PerkObject> Perks => Game.Current.ObjectManager.GetObjectTypeList<PerkObject>().ToLookupTable();
 
-        public static IEnumerable<CharacterAttribute> Attributes => Game.Current.ObjectManager.GetObjectTypeList<CharacterAttribute>().ToLookupTable();
+        public static ILookupTable<CharacterAttribute> CharacterAttributes => Game.Current.ObjectManager.GetObjectTypeList<CharacterAttribute>().ToLookupTable();//BUG
 
-        public static IEnumerable<TraitObject> Traits => Game.Current.ObjectManager.GetObjectTypeList<TraitObject>().ToLookupTable();
+        public static ILookupTable<TraitObject> Traits => Game.Current.ObjectManager.GetObjectTypeList<TraitObject>().ToLookupTable();
 
-        public static IEnumerable<SkillObject> Skills => Game.Current.ObjectManager.GetObjectTypeList<SkillObject>().ToLookupTable();
+        public static ILookupTable<SkillObject> Skills => Game.Current.ObjectManager.GetObjectTypeList<SkillObject>().ToLookupTable();//BUG
 
         public static ILookupTable<Hero> Descendants(this Hero hero) {
             IEnumerable<Hero> GetDescendants(Hero hero) {

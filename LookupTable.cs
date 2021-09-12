@@ -79,7 +79,11 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
             Getter<Town>.Get = () => ScriptGlobals.Fiefs;
             Getter<Village>.Get = () => ScriptGlobals.Villages;
             Getter<MobileParty>.Get = () => ScriptGlobals.Parties;
-            Getter<ItemObject>.Get = () => ScriptGlobals.Items;
+            Getter<ItemObject>.Get = () => ScriptGlobals.ItemObjects;
+            Getter<PerkObject>.Get = () => ScriptGlobals.Perks;
+            Getter<CharacterAttribute>.Get = () => ScriptGlobals.CharacterAttributes;
+            Getter<TraitObject>.Get = () => ScriptGlobals.Traits;
+            Getter<SkillObject>.Get = () => ScriptGlobals.Skills;
         }
 
         private static LookupTables Instance;
