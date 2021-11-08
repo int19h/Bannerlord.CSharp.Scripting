@@ -4,7 +4,7 @@ This mod for [M&B2: Bannerlord](https://www.taleworlds.com/en/Games/Bannerlord) 
 
 ## Prerequisites
 
-The mod is tested with Bannerlord e1.6.1 and e1.6.2 beta. Older versions of the game *may* work, but are considered unsupported.
+The mod is tested with Bannerlord e1.6.1-e1.6.5b. Older versions of the game *may* work, but are considered unsupported.
 
 There are no known compatibility issues with other Bannerlord mods. 
 
