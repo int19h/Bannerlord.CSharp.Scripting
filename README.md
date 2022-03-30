@@ -4,13 +4,11 @@ This mod for [M&B2: Bannerlord](https://www.taleworlds.com/en/Games/Bannerlord) 
 
 ## Prerequisites
 
-The mod is tested with Bannerlord e1.6.1-e1.6.5b. Older versions of the game *may* work, but are considered unsupported.
+The mod is tested with Bannerlord e1.7.0-e1.7.1. Bannerlord e1.7.2 beta is not supported at the moment. Older versions of the game *may* work, but are considered unsupported.
 
 There are no known compatibility issues with other Bannerlord mods. 
 
 ## Installation
-
-**WARNING**: if you had csx 0.1.0 or 0.2.0 installed, please remove it first by deleting the `csx` folder in your Bannerlord `Modules` folder.
 
 Download the most recent version from [Releases](https://github.com/int19h/Bannerlord.CSharp.Scripting/releases), and unpack it to the `Modules` folder of your Bannerlord installation. You may need to unblock the DLLs to allow Windows to load them.
 
