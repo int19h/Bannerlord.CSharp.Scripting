@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
     <TargetFramework>net472</TargetFramework>
     <Platforms>x64</Platforms>
     <LangVersion>10.0</LangVersion>
@@ -14,7 +14,7 @@
   <PropertyGroup>
     <GameFolder Condition="'$(GameFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <Product>C# Scripting for Mount &amp; Blade II: Bannerlord</Product>
-    <Copyright>Copyright © 2020-2021 Pavel "int19h" Minaev</Copyright>
+    <Copyright>Copyright © 2020-2022 Pavel "int19h" Minaev</Copyright>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/int19h/Bannerlord.CSharp.Scripting</PackageProjectUrl>
     <RepositoryUrl>https://github.com/int19h/Bannerlord.CSharp.Scripting</RepositoryUrl>
