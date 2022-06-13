@@ -1,4 +1,6 @@
 ﻿using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     public abstract class Lookup {

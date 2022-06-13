@@ -6,7 +6,7 @@ void CityStates() {
         }
 
         var color = clan.Kingdom.PrimaryBannerColor;
-        ChangeKingdomAction.ApplyByLeaveWithRebellionAgainstKingdom(clan, null);
+        ChangeKingdomAction.ApplyByLeaveWithRebellionAgainstKingdom(clan, false);
         clan.UpdateBannerColor(uint.MaxValue, color);
         clan.Banner?.ChangePrimaryColor(uint.MaxValue);
         clan.Banner?.ChangeIconColors(color);

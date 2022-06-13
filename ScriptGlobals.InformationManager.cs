@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.CompilerServices;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     partial class ScriptGlobals {

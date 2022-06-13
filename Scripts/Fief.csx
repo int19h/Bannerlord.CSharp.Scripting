@@ -57,7 +57,7 @@ void ShowValue(Town[] fiefs)  {
     var maxLength = fiefs.Max(fief => fief.Name.ToString().Length);
     var lines =
         from fief in fiefs
-        let value = Campaign.Current.Models.SettlementValueModel.CalculateValueForFaction(fief.Settlement, fief.OwnerClan)
+        let value = Campaign.Current.Models.SettlementValueModel.CalculateSettlementValueForFaction(fief.Settlement, fief.OwnerClan)
         orderby value descending
         let icon = fief.IsTown ? "@" : "*"
         let name = $"{fief.Name}".PadRight(maxLength)
@@ -66,6 +66,8 @@ void ShowValue(Town[] fiefs)  {
         Log.WriteLine(line);
     }
 }
+
+void ShowValue(Kingdom kingdom) => ShowValue(kingdom.Fiefs.ToArray());
 
 void ShowValue() => ShowValue(All);
 
@@ -93,5 +95,46 @@ void Rebel(Town[] fiefs) {
     foreach (var fief in fiefs) {
         Log.WriteLine(fief);
         IgnoreVisibility(() => rcb.StartRebellionEvent(fief.Settlement));
+    }
+}
+
+void ListVillages(Town[] towns) {
+    foreach (var town in towns) {
+        if (!town.IsTown) {
+            continue;
+        }
+        Log.WriteLine($"{town}");
+        foreach (var village in Village.All) {
+            if (village.MarketTown == town) {
+                Log.WriteLine($"    {village}:");
+                foreach (var (item, value) in village.VillageType.Productions) {
+                    Log.WriteLine($"      {item} ({value})");
+                }
+            }
+        }
+    }
+}
+
+void ShowProductions(Town[] towns) {
+    foreach (var town in towns) {
+        if (!town.IsTown) {
+            continue;
+        }
+
+        var prods = new Dictionary<ItemObject, float>();
+        foreach (var village in Village.All) {
+            if (village.MarketTown == town) {
+                foreach (var (item, value) in village.VillageType.Productions) {
+                    prods.TryGetValue(item, out var n);
+                    n += value;
+                    prods[item] = n;
+                }
+            }
+        }
+
+        Log.WriteLine($"{town}:");
+        foreach (var kv in prods.OrderByDescending(kv => kv.Value)) {
+            Log.WriteLine($"    {kv.Key} - {kv.Value}");
+        }
     }
 }

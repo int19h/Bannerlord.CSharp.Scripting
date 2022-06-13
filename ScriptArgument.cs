@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
@@ -273,7 +275,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
     internal class UnrestrictedScriptArgument : ScriptArgument<Kingdom, Clan, Hero, Settlement, Town, Village, MobileParty, ItemObject> {
         internal UnrestrictedScriptArgument(object?[] values) : base(values) { }
 
-        private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty>(Values);
+        private dynamic Unrestricted<T>() => new ScriptArgument<T, Kingdom, Clan, Hero, Town, Village, MobileParty, ItemObject>(Values);
 
         internal new dynamic RestrictBy(string s) => Unrestricted<string>();
 

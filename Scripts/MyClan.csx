@@ -25,7 +25,7 @@ void ListMembers() {
 /// <summary>
 /// Lists all of the player clan's unmarried nobles of marriageable age.
 /// </summary>
-void ListUnmarried() {
+void ListUnmarried(string culture = null, string kingdom = null, bool? foreign = null) {
     foreach (var hero in MyClan.Lords.OrderBy(h => $"{h.Name}")) {
         if (!hero.IsAlive || hero.Age < 18 || hero.Spouse != null) {
             continue;
@@ -38,13 +38,26 @@ void ListUnmarried() {
             if (clan == MyClan) {
                 continue;
             }
+            if (kingdom != null && $"{clan.Kingdom?.Name}" != kingdom) {
+                continue;
+            }
+            if (foreign == true && clan.Kingdom == hero.Clan.Kingdom) {
+                continue;
+            }
+            if (foreign == false && clan.Kingdom != hero.Clan.Kingdom) {
+                continue;
+            }
 
             foreach (var other in clan.Lords.OrderByDescending(h => h.Age)) {
-                if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(hero, other)) {
-                    candidates.Add(other);
+                var rcb = Campaign.Current.GetCampaignBehavior<RomanceCampaignBehavior>();
+                if (Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(hero, other)) {
+                    if (culture == null || $"{other.Culture.Name}" == culture) {
+                        candidates.Add(other);
+                    }
                     break;
                 }
             }
+
         }
 
         if (!candidates.Any()) {
@@ -139,5 +152,29 @@ void ShowStashes() {
         foreach (var item in stash.OrderBy(it => $"{it.EquipmentElement.Item.Name}")) {
             Log.WriteLine($"  {item.EquipmentElement.Item.Name} - {item.Amount}");
         }
+    }
+}
+
+void ShowIncome() {
+    var tips = CampaignUIHelper.GetGoldTooltip(MyClan);
+    foreach (var tip in tips) {
+        Log.WriteLine($"{tip.DefinitionLabel} {tip.ValueLabel}");
+    }
+}
+
+void ShowPartiesIncome() {
+    foreach (var hero in MyClan.Heroes) {
+        if (!hero.IsPartyLeader) continue;
+        var g1 = hero.Gold;
+        var g2 = hero.PartyBelongedTo.PartyTradeGold;
+        Log.WriteLine($"{hero} {g1} {g2}");
+    }
+}
+
+void ResetPartiesGold() {
+    foreach (var hero in MyClan.Heroes) {
+        if (hero == Me || !hero.IsPartyLeader) continue;
+        Log.WriteLine($"{hero}");
+        hero.Gold = 10000;
     }
 }

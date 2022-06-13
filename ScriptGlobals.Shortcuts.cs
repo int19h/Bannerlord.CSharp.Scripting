@@ -1,4 +1,7 @@
 ﻿using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 
 namespace Int19h.Bannerlord.CSharp.Scripting {
     partial class ScriptGlobals {
