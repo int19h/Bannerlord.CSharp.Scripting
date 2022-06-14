@@ -71,7 +71,7 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 }
                 writer.WriteLine();
 
-                var gameAppVer = ApplicationVersion.FromParametersFile(ApplicationVersionGameType.Singleplayer);
+                var gameAppVer = ApplicationVersion.FromParametersFile();
                 var gameVer = new Version(gameAppVer.Major, gameAppVer.Minor, gameAppVer.Revision);
                 for (var major = 1; major < 10; ++major) {
                     for (var minor = 6; minor < 10; ++minor) {
