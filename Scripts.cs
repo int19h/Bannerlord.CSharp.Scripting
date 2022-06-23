@@ -42,7 +42,10 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                 writer.WriteLine($"/r:\"{typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).Assembly.Location}\"");
                 var nss = new HashSet<string>();
                 foreach (var asm in AppDomain.CurrentDomain.GetAssemblies()) {
-                    if (asm.IsDynamic || string.IsNullOrEmpty(asm.Location)) {
+                    if (
+                        asm.IsDynamic || string.IsNullOrEmpty(asm.Location) ||
+                        asm.Location.EndsWith("netstandard.dll", StringComparison.OrdinalIgnoreCase)
+                    ) {
                         continue;
                     }
                     writer.WriteLine($"/r:\"{asm.Location}\"");
