@@ -16,3 +16,9 @@ void ClearPersuasion() {
     var ldcb = Campaign.Current.CampaignBehaviorManager.GetBehavior<LordDefectionCampaignBehavior>();
     ldcb.ClearPersuasion();
 }
+
+void Converse(Hero other) {
+    var ccd1 = new ConversationCharacterData(Hero.MainHero.CharacterObject);
+    var ccd2 = new ConversationCharacterData(other.CharacterObject);
+    CampaignMapConversation.OpenConversation(ccd1, ccd2);
+}

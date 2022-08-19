@@ -4,7 +4,8 @@ using SandBox.View.Map;
 /// Removes all quick info notifications.
 /// </summary>
 void ClearQuickInfo() {
-    var vm = (GameNotificationVM)typeof(GameNotificationManager).InvokeMember("_dataSource", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField, null, null, null);
+    var ggn = GauntletGameNotification.Current;
+    var vm = (GameNotificationVM)ggn.GetType().InvokeMember("_dataSource", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField, null, ggn, null);
     vm.ClearNotifications();
 }
 

@@ -105,7 +105,7 @@ void ListVillages(Town[] towns) {
         }
         Log.WriteLine($"{town}");
         foreach (var village in Village.All) {
-            if (village.MarketTown == town) {
+            if (village.TradeBound.Town == town) {
                 Log.WriteLine($"    {village}:");
                 foreach (var (item, value) in village.VillageType.Productions) {
                     Log.WriteLine($"      {item} ({value})");
@@ -116,14 +116,10 @@ void ListVillages(Town[] towns) {
 }
 
 void ShowProductions(Town[] towns) {
-    foreach (var town in towns) {
-        if (!town.IsTown) {
-            continue;
-        }
-
+    IEnumerable<(ItemObject Item, float Value)> GetProductions(Town town) {
         var prods = new Dictionary<ItemObject, float>();
         foreach (var village in Village.All) {
-            if (village.MarketTown == town) {
+            if (village.TradeBound.Town == town) {
                 foreach (var (item, value) in village.VillageType.Productions) {
                     prods.TryGetValue(item, out var n);
                     n += value;
@@ -131,10 +127,50 @@ void ShowProductions(Town[] towns) {
                 }
             }
         }
+        foreach (var kv in prods) {
+            yield return (kv.Key, kv.Value);
+        }
+    }
 
+    IEnumerable<(Town Town, IEnumerable<(ItemObject Item, float Value)> Productions)> townProds =
+        from town in towns
+        where town.IsTown
+        let prods = GetProductions(town)
+        let total = prods.Sum(tp => tp.Value)
+        orderby total descending
+        select (town, prods);
+
+    foreach (var (town, prods) in townProds) {
         Log.WriteLine($"{town}:");
-        foreach (var kv in prods.OrderByDescending(kv => kv.Value)) {
-            Log.WriteLine($"    {kv.Key} - {kv.Value}");
+        foreach (var p in prods.OrderByDescending(p => p.Value)) {
+            Log.WriteLine($"    {p.Item} - {p.Value}");
+        }
+    }
+
+    var prodItems = (
+        from tp in townProds
+        from p in tp.Productions
+        orderby p.Item.StringId
+        select p.Item
+    ).Distinct();
+    using (var f = System.IO.File.CreateText("c:/temp/production.csv")) {
+        f.Write("\"\"");
+        foreach (var item in prodItems) {
+            f.Write($",{item.StringId}");
+        }
+        f.WriteLine();
+
+        foreach (var (town, prods) in townProds) {
+            f.Write('"' + town.Name.ToString() + '"');
+            foreach (var item in prodItems) {
+                var value = (
+                    from p in prods
+                    where p.Item == item
+                    select p.Value
+                ).FirstOrDefault();
+                f.Write($",{value}");
+            }
+            f.WriteLine();
         }
     }
 }

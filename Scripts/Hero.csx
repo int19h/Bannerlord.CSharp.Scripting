@@ -104,7 +104,7 @@ void SetSkills(
             if (value is int newValue && newValue != oldValue) {
                 newValue = Math.Min(newValue, 1023);
                 Log.WriteLine($"  {skill}: {oldValue} -> {newValue}");
-                IgnoreVisibility(() => hero.SetSkillValueInternal(skill, newValue));
+                IgnoreVisibility(() => hero.SetSkillValue(skill, newValue));
             }
         }
 
@@ -220,7 +220,7 @@ void SetTraits(
             if (value is int newValue && newValue != oldValue) {
                 newValue = Math.Max(Math.Min(newValue, 2), -2);
                 Log.WriteLine($"  {trait.Name}: {oldValue} -> {newValue}");
-                hero.SetTraitLevelInternal(trait, newValue);
+                hero.SetTraitLevel(trait, newValue);
             }
         }
 
