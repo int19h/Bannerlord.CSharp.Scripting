@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <TargetFramework>net472</TargetFramework>
     <Platforms>x64</Platforms>
     <LangVersion>10.0</LangVersion>
@@ -130,6 +130,6 @@
   <PropertyGroup>
     <PostBuildCopyToModulesRegex>.*\.csx|$(PostBuildCopyToModulesRegex)</PostBuildCopyToModulesRegex>
     <AssemblyName>Int19h.Bannerlord.CSharp.Scripting</AssemblyName>
-    <Description>https://github.com/int19h/Bannerlord.CSharp.Scripting</Description>
+    <Description></Description>
   </PropertyGroup>
 </Project>
