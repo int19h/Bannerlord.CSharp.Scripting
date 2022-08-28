@@ -42,7 +42,15 @@ namespace Int19h.Bannerlord.CSharp.Scripting {
                     json.CopyTo(stream);
                 }
             } catch (Exception) {
-                return;
+            }
+
+            fileName = Path.Combine(Scripts.UserLocation, "omnisharp.csproj");
+            try {
+                using (var stream = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
+                using (var writer = new StreamWriter(stream)) {
+                    writer.Write(@"<Project Sdk='Microsoft.NET.Sdk'><PropertyGroup><TargetFrameworks>net472</TargetFrameworks></PropertyGroup></Project>");
+                }
+            } catch (Exception) {
             }
         }
     }
